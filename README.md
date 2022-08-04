@@ -4,7 +4,7 @@ Bürokratt's Service Module is a tool to help primarily product owners in collab
 
 Service Module focuses on the part of creation of any service where Bürokratt users can define service endpoints (i.e API or X-Road) whereas Training Module focuses on Rasa's side.  
 
-#Scope
+# Scope
 This repo will primarily contain
 
 Architectural and other documentation;
