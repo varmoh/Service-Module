@@ -5,8 +5,8 @@ Bürokratt's Service Module is a tool to help primarily product owners in collab
 Service Module focuses on the part of creation of any service where Bürokratt users can define service endpoints (i.e API or X-Road) whereas Training Module focuses on Rasa's side.  
 
 # Scope
-This repo will primarily contain
+This repo will primarily contain:
 
-Architectural and other documentation;
-Docker Compose file to set up and run Bürokratt's Service Module as a fully functional service;
-Tests specific to Bürokratt's Service Module.
+1. Architectural and other documentation;
+2. Docker Compose file to set up and run Bürokratt's Service Module as a fully functional service;
+3. Tests specific to Bürokratt's Service Module.
