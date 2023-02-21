@@ -42,6 +42,16 @@ services:
       - ./data:/var/lib/postgresql/data
     networks:
       - bykstack
+  data_mapper: 
+     container_name: data_mapper 
+     image: datamapper-node
+     volumes:
+      - ./DSL/DMapper/hbs:/workspace/app/views/analytics
+      - ./DSL/DMapper/js:/workspace/app/js/analytics
+     ports:
+      - 3000:3000
+     networks:
+      - bykstack 
      
 networks:
   bykstack:
