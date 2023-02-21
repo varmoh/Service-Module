@@ -1,7 +1,8 @@
 {
   "global": {
     "title": "Service Module",
-    "services": "Services"
+    "services": "Services",
+    "backhome": "Back to homepage"
   },
   "menu": {
     "overview": "Overview",

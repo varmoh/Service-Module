@@ -1,7 +1,8 @@
 {
   "global": {
     "title": "Teenindus moodul",
-    "services": "Teenindus"
+    "services": "Teenindus",
+    "backhome": "Tagasi avalehele"
   },
   "menu": {
     "overview": "Ülevaade",
