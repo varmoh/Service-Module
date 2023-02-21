@@ -1,0 +1,12 @@
+/data
+.DS_Store
+.vscode
+.env
+
+**/node_modules
+**/.pnp
+**/.pnp.js
+**/coverage
+**/build
+**/.eslintcache
+**/npm-debug.log*
