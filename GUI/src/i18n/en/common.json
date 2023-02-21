@@ -1,0 +1,10 @@
+{
+  "global": {
+    "title": "Service Module",
+    "services": "Services"
+  },
+  "menu": {
+    "overview": "Overview",
+    "close": "Close menu"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "global": {
+    "title": "Teenindus moodul",
+    "services": "Teenindus"
+  },
+  "menu": {
+    "overview": "Ülevaade",
+    "close": "Sulge menüü"
+  }
+}
