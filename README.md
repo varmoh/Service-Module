@@ -12,7 +12,7 @@ This repo will primarily contain:
 3. Tests specific to Bürokratt's Service Module.
 
 ## Dev setup
-* Clone Ruuter
+* Clone [Ruuter](https://github.com/buerokratt/Ruuter)
 
 * For Apple Silicon, replace Ruuter's Dockerfile line and add platform specification FROM --platform=linux/amd64 openjdk:17-jdk-alpine
 
@@ -20,11 +20,11 @@ This repo will primarily contain:
 
 * Navigate to Ruuter and build the image docker build -t ruuter .
 
-* Clone Resql
+* Clone [Resql](https://github.com/buerokratt/Resql)
 
 * Navigate to Resql and build the image docker build -t resql .
 
-* Clone Data Mapper
+* Clone [Data Mapper](https://github.com/buerokratt/DataMapper)
 
 * Navigate to Data Mapper and build the image docker build -t datamapper-node .
 
