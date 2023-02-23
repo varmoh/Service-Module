@@ -1,30 +1,5 @@
 version: '3.9'
 services:
-  gui_dev:
-    container_name: gui_dev
-    environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-      - REACT_APP_API_URL=http://localhost:8080
-      - PORT=3001
-    build:
-      context: ./GUI
-      dockerfile: Dockerfile.dev
-    ports:
-      - 3001:3001
-    volumes:
-      - /app/node_modules
-      - ./GUI:/app
-    networks:
-      - bykstack
-
-networks:
-  bykstack:
-    name: bykstack
-    driver: bridge
-
-version: '3.9'
-services:
   ruuter:
     container_name: ruuter
     image: ruuter
@@ -71,12 +46,29 @@ services:
      container_name: data_mapper 
      image: datamapper-node
      volumes:
-      - ./DSL/DMapper/hbs:/workspace/app/views/analytics
-      - ./DSL/DMapper/js:/workspace/app/js/analytics
+      - ./DSL/DMapper/hbs:/workspace/app/views/services
+      - ./DSL/DMapper/js:/workspace/app/js/services
      ports:
       - 3000:3000
      networks:
       - bykstack 
+  gui_dev:
+    container_name: gui_dev
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL=http://localhost:8080
+      - PORT=3001
+    build:
+      context: ./GUI
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3001:3001
+    volumes:
+      - /app/node_modules
+      - ./GUI:/app
+    networks:
+      - bykstack    
      
 networks:
   bykstack:
