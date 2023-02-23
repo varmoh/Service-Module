@@ -1,0 +1,11 @@
+{
+  "global": {
+    "title": "Teenindus moodul",
+    "services": "Teenindus",
+    "backhome": "Tagasi avalehele"
+  },
+  "menu": {
+    "overview": "Ülevaade",
+    "close": "Sulge menüü"
+  }
+}

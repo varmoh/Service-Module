@@ -1,5 +1,30 @@
 version: '3.9'
 services:
+  gui_dev:
+    container_name: gui_dev
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL=http://localhost:8080
+      - PORT=3001
+    build:
+      context: ./GUI
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3001:3001
+    volumes:
+      - /app/node_modules
+      - ./GUI:/app
+    networks:
+      - bykstack
+
+networks:
+  bykstack:
+    name: bykstack
+    driver: bridge
+
+version: '3.9'
+services:
   ruuter:
     container_name: ruuter
     image: ruuter
