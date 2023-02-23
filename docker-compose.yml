@@ -1,5 +1,57 @@
 version: '3.9'
 services:
+  ruuter:
+    container_name: ruuter
+    image: ruuter
+    environment:
+      - application.cors.allowedOrigins=http://localhost:3001
+      - application.httpCodesAllowList=200,201,202,400,401,403,500
+    volumes:
+      - ./DSL/Ruuter:/DSL
+    ports:
+      - 8080:8080
+    networks:
+      - bykstack
+  resql:
+    container_name: resql
+    image: resql
+    depends_on:
+      - users_db
+    environment:
+      - sqlms.datasources.[0].name=byk
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db:5432/byk
+      - sqlms.datasources.[0].username=byk
+      - sqlms.datasources.[0].password=01234
+      - logging.level.org.springframework.boot=INFO
+    ports:
+      - 8082:8082
+    volumes:
+      - ./DSL/Resql/services:/workspace/app/templates/byk
+    networks:
+      - bykstack
+  users_db:
+    container_name: users_db
+    image: postgres:14.1
+    environment:
+      - POSTGRES_USER=byk
+      - POSTGRES_PASSWORD=01234
+      - POSTGRES_DB=byk
+    ports:
+      - 5433:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - bykstack
+  data_mapper: 
+     container_name: data_mapper 
+     image: datamapper-node
+     volumes:
+      - ./DSL/DMapper/hbs:/workspace/app/views/services
+      - ./DSL/DMapper/js:/workspace/app/js/services
+     ports:
+      - 3000:3000
+     networks:
+      - bykstack 
   gui_dev:
     container_name: gui_dev
     environment:
@@ -16,8 +68,8 @@ services:
       - /app/node_modules
       - ./GUI:/app
     networks:
-      - bykstack
-
+      - bykstack    
+     
 networks:
   bykstack:
     name: bykstack
