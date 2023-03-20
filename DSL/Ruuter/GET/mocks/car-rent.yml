@@ -1,0 +1,49 @@
+client_input:
+  call: reflect.mock
+  args:
+    response:
+      client_input: "Well, I'd like to rent it in Vlj"
+      can_detect_with_opensearch: "[SERVICE] car_rent [LOCATION] Viljandi"
+  result: reflected_client_input
+
+intent_detection:
+  call: reflect.mock
+  args:
+    response:
+      component: "Rasa, OpenSearch to be"
+      input: ${reflected_client_input}
+  result: intent_detected_by_rasa
+
+next_steps_by_rasa:
+  call: reflect.mock
+  args:
+    response:
+      component: "Rasa, OpenSearch to be"
+      input: ${intent_detected_by_rasa}
+      output: "#service_car_rent"
+  result: service_detected_by_rasa
+
+conditionalSwitchForLaunchingService:
+  switch:
+    - condition: ${service_detected_by_rasa === "#avg_median_wage_in_estonia"}
+      next: launch_service_avg_median_wage_in_estonia
+    - condition: ${service_detected_by_rasa === "service_car_rent"}
+      next: launch_service_requiring_rasa_stories
+  next: requiring_rasa_stories
+
+requiring_rasa_stories:
+  call: reflect.mock
+  args:
+    response:
+      component: "Rasa"
+      condition: "MUST use from_text instead of from_entity"
+      additional_information: "Client input is first detected and labelled by using OpenSearch"
+      example_input: "Well, I'd like to rent it in Vlj"
+      example_output: "By using #19, the output would be \"Viljandi\""
+      client_input: "Some additional input from the client in addition to " ${reflected_client_input}
+
+expected_result_from_rasa:
+  call: reflect.mock
+  args:
+    response:
+      result: "[SERVICE] car_rent [LOCATION] Viljandi [START] 2023-03-20 17:00:00 [TO] 2023-03-20 21:00:00"
