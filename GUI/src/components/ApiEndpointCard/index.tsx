@@ -3,8 +3,6 @@ import { FC, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import {
   Button,
-  EndpointCustom,
-  EndpointOpenAPI,
   EndpointResqlComponent,
   FormInput,
   FormSelect,
@@ -14,6 +12,8 @@ import {
 import { Option } from "../../types/option";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
+import EndpointOpenAPI from "./Endpoints/OpenAPI";
+import EndpointCustom from "./Endpoints/Custom";
 import "./ApiEndpointCard.scss";
 
 type EndpointCardProps = {
