@@ -1,5 +1,6 @@
 import { CSSProperties, FC, useState } from "react";
 import { MdPlayCircleFilled } from "react-icons/md";
+
 import {
   MarkerType,
   Node,
@@ -99,6 +100,7 @@ const ServiceFlowPage: FC = () => {
       type: StepType.FinishingStepRedirect,
     },
   ];
+
   const [updatedRules, setUpdatedRules] = useState<(string | null)[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([initialEdge]);
