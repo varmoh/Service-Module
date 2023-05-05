@@ -59,18 +59,20 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const getEdgeLength = () => 5 * GRID_UNIT;
 
   useEffect(() => {
-    setNodes((prevNodes) => prevNodes.map((node) => {
-      if (node.type !== "customNode") return node;
-      node.data = {
-        ...node.data,
-        onDelete,
-        onEdit: handleNodeEdit,
-        setClickedNode,
-        update: updateInputRules,
-      }
-      return node;
-    }));
-  }, [reactFlowInstance])
+    setNodes((prevNodes) =>
+      prevNodes.map((node) => {
+        if (node.type !== "customNode") return node;
+        node.data = {
+          ...node.data,
+          onDelete,
+          onEdit: handleNodeEdit,
+          setClickedNode,
+          update: updateInputRules,
+        };
+        return node;
+      })
+    );
+  }, [reactFlowInstance]);
 
   // Align nodes in case any got overlapped
   const alignNodes = (nodeChanges: NodeChange[]) => {
@@ -375,12 +377,11 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
               label: type === "input" ? `${label} - ${newClientInputId}` : label,
               onDelete,
               onEdit: handleNodeEdit,
-              clientInputId: type === StepType.Input ? newClientInputId : undefined,
-              type: [
-                StepType.FinishingStepEnd,
-                StepType.FinishingStepRedirect
-              ].includes(type) ? "finishing-step" : "step",
+              type: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
+                ? "finishing-step"
+                : "step",
               stepType: type,
+              clientInputId: type === StepType.Input ? newClientInputId : undefined,
               readonly: [
                 StepType.Auth,
                 StepType.FileSign,
@@ -418,9 +419,9 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const setDefaultMessages = (stepType: StepType) => {
     switch (stepType) {
       case StepType.FinishingStepEnd:
-        return 'Teenus on lõpetatud';
+        return "Teenus on lõpetatud";
       case StepType.FinishingStepRedirect:
-        return 'Vestlus suunatakse klienditeenindajale';
+        return "Vestlus suunatakse klienditeenindajale";
     }
   };
 
@@ -586,7 +587,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             newNodes.push(
               ...buildRuleWithPlaceholder({
                 id: newRuleId,
-                label: `rule ${i}`,
+                label: `rule ${i + 1}`,
                 offset: offset,
                 inputNode: inputNode,
               })
@@ -596,7 +597,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
             // Move existing rule node with following node to keep them in order
             const ruleNode = newNodes.find((node) => node.id === rule);
             if (!ruleNode) return rule;
-            ruleNode.data.label = `rule ${i}`;
+            ruleNode.data.label = `rule ${i + 1}`;
             ruleNode.position.x = inputNode.position.x + offset;
 
             const ruleEdge = edges.find((edge) => edge.source === rule);
