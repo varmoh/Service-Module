@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useDrop } from "react-dnd"
+
 import { ConditionRuleType } from "../../types"
 import { FormInput } from "../FormElements"
 
