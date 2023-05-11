@@ -127,6 +127,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
             </Button>
           </Track>
         </Track>
+
       }
     >
       <Track direction="vertical" align="stretch" gap={16} className="flow-body-reverse-margin">
@@ -159,7 +160,10 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({ node, onClose, on
               />
             )}
             {stepType === StepType.OpenWebpage && (
-              <OpenWebPageContent onWebpageNameChange={setWebpageName} onWebpageUrlChange={setWebpageUrl} />
+              <OpenWebPageContent
+                onWebpageNameChange={setWebpageName}
+                onWebpageUrlChange={setWebpageUrl}
+              />
             )}
             {(stepType === StepType.FileGenerate || stepType === StepType.Input) && (
               <DndProvider backend={HTML5Backend}>
