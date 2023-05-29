@@ -20,6 +20,7 @@ const RootComponent: React.FC = () => {
       <Route element={<Layout />}>
         <Route path={ROUTES.OVERVIEW_ROUTE} element={<OverviewPage />} />
         <Route path={ROUTES.FOLLOWUPTRAINING_ROUTE} element={<IntentsFollowupTraining />} />
+        <Route path={ROUTES.FAULTY_SERVICES_ROUTE} element={<FaultyServicesPage />} />
         <Route path={ROUTES.SERVICE_SETTINGS} element={<ServiceSettingPage />} />
         <Route path={ROUTES.FAULTY_SERVICES_ROUTE} element={<FaultyServicesPage />} />
         <Route path="*" element={<NotFoundPage />} />
