@@ -57,13 +57,11 @@
     "yup": "^1.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "eject": "react-scripts eject",
-    "lint": "eslint --cache .",
-    "format": "prettier --check .",
-    "dev": "vite --host",
-    "preview": "vite preview"
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit && eslint \"./src/**/*.{js,ts,tsx}\"",
+    "prettier": "prettier --write \"{,!(node_modules)/**/}*.{ts,tsx,js,json,css,less,scss}\"",
+    "dev": "vite --host"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -72,7 +70,6 @@
     "defaults",
     "not IE 11"
   ],
-  "homepage": "/services/",
   "devDependencies": {
     "vite": "^4.0.0",
     "vite-plugin-env-compatible": "^1.1.1",
