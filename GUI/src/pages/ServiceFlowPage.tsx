@@ -120,6 +120,8 @@ const ServiceFlowPage: FC = () => {
   };
   const [nodes, setNodes, onNodesChange] = useNodesState(flow ? resetNodes() : initialNodes);
   const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
+  const [isTestButtonEnabled, setIsTestButtonEnabled] = useState(true);
+
 
   const getTemplateDataFromNode = (
     node: Node
@@ -671,6 +673,7 @@ const ServiceFlowPage: FC = () => {
   const saveFlow = async () => {
     console.log(nodes);
     console.log(edges);
+    try {
     await saveEndpoints();
     const allRelations: any[] = [];
     // find regular edges 1 -> 1
@@ -678,6 +681,24 @@ const ServiceFlowPage: FC = () => {
       const node = nodes.find((node) => node.id === edge.source);
       const followingNode = nodes.find((node) => node.id === edge.target);
       if (!node) return;
+      if (node.data.stepType === StepType.Textfield && node.data.message === undefined) {
+        throw new Error(t('toast.missing-textfield-message') ?? 'Error');
+      }
+      if (
+        node.data.stepType === StepType.OpenWebpage &&
+        (node.data.link === undefined ||
+        node.data.linkText === undefined)
+      ) {
+        throw new Error(t("toast.missing-website") ?? "Error");
+      }
+
+      if (
+        node.data.stepType === StepType.FileGenerate &&
+        (node.data.fileName === undefined || node.data.fileContent === undefined)
+      ) {
+        throw new Error(t("toast.missing-file-generation") ?? "Error");
+      }
+      
       if (node.data.stepType === StepType.Input || followingNode?.type === "placeholder") {
         if (!allRelations.includes(node.id)) allRelations.push(node.id);
         return;
@@ -712,6 +733,10 @@ const ServiceFlowPage: FC = () => {
       const childNode = nodes.find((node) => node.id === childNodeId);
       const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
       if (parentNode.data.stepType === StepType.Input) {
+        if (parentNode.data.rules === undefined) {
+          throw new Error(t("toast.missing-client_input-rules") ?? "Error");
+        }
+
         const clientInput = `ClientInput_${parentNode.data.clientInputId}`;
         const clientInputName = `${clientInput}-step`;
         finishedFlow.set(parentStepName, getTemplate(parentNode, clientInputName, `${clientInput}-assign`));
@@ -775,10 +800,18 @@ const ServiceFlowPage: FC = () => {
       .then((r) => {
         console.log(r);
         setIsTestButtonVisible(true);
+        setIsTestButtonEnabled(true);
       })
       .catch((e) => {
         console.log(e);
       });
+    } catch (e: any) {
+      toast.open({
+        type: "error",
+        title: t("toast.cannot-save-flow"),
+        message: e?.message ?? "",
+      });
+    }
   };
 
   useEffect(() => {
@@ -809,14 +842,25 @@ const ServiceFlowPage: FC = () => {
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
 
   const handlePopupClose = () => resetStates();
+  const onNodeDelete = () => setIsTestButtonEnabled(false);
+  const onNodeAdded = () => setIsTestButtonEnabled(false);
 
   const handlePopupSave = (updatedNode: Node<NodeDataProps>) => {
     resetStates();
     if (selectedNode?.data.stepType === StepType.FinishingStepEnd) return;
 
-    setNodes((prevNodes) =>
+    setNodes((prevNodes) => 
       prevNodes.map((prevNode) => {
         if (prevNode.id !== selectedNode!.id) return prevNode;
+        if (
+          prevNode.data.message != updatedNode.data.message ||
+          prevNode.data.link != updatedNode.data.link ||
+          prevNode.data.linkText != updatedNode.data.linkText ||
+          prevNode.data.fileName != updatedNode.data.fileName ||
+          prevNode.data.fileContent != updatedNode.data.fileContent
+        ) {
+          setIsTestButtonEnabled(false);
+        };
         return {
           ...prevNode,
           data: {
@@ -867,11 +911,24 @@ const ServiceFlowPage: FC = () => {
         secrets={secrets}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
         isTestButtonVisible={isTestButtonVisible}
+        isTestButtonEnabled={isTestButtonEnabled}
         onTestButtonClick={runServiceTest}
       />
-      <h1 style={{ padding: 16 }}>
+      <h1 style={{ paddingLeft: 16, paddingTop: 16 }}>
         {t("serviceFlow.flow")} "{serviceName}"
       </h1>
+      <h5
+        style={{
+          paddingLeft: 16,
+          paddingBottom: 5,
+          wordBreak: "break-all",
+          textOverflow: "ellipsis",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {serviceDescription}
+      </h5>
       <FlowElementsPopup
         availableVariables={availableVariables}
         onClose={() => handlePopupClose()}
@@ -939,12 +996,15 @@ const ServiceFlowPage: FC = () => {
             setReactFlowInstance={setReactFlowInstance}
             onNodeEdit={setSelectedNode}
             updatedRules={updatedRules}
+            description={serviceDescription}
             nodes={nodes}
             setNodes={setNodes}
             onNodesChange={onNodesChange}
             edges={edges}
             setEdges={setEdges}
             onEdgesChange={onEdgesChange}
+            onNodeAdded={onNodeAdded}
+            onNodeDelete={onNodeDelete}
           />
         </div>
       </ReactFlowProvider>

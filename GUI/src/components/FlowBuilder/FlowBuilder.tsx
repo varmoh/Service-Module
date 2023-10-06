@@ -1,8 +1,10 @@
 import { Dispatch, FC, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Background,
+  Controls,
   Edge,
   MarkerType,
+  MiniMap,
   Node,
   NodeChange,
   NodeDimensionChange,
@@ -33,11 +35,14 @@ type FlowBuilderProps = {
   nodes: Node[];
   setNodes: Dispatch<SetStateAction<Node[]>>;
   onNodesChange: OnNodesChange;
+  onNodeAdded: () => void;
+  onNodeDelete: () => void;
   edges: Edge[];
   setEdges: Dispatch<SetStateAction<Edge[]>>;
   onEdgesChange: OnEdgesChange;
   reactFlowInstance?: ReactFlowInstance;
   setReactFlowInstance: Dispatch<SetStateAction<ReactFlowInstance | undefined>>;
+  description: string;
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
@@ -49,13 +54,17 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   edges,
   setEdges,
   onEdgesChange,
+  onNodeAdded,
+  onNodeDelete,
   reactFlowInstance,
   setReactFlowInstance,
+  description,
 }) => {
   const { t } = useTranslation();
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [clickedNode, setClickedNode] = useState();
+  const startDragNode = useRef<Node | undefined>(undefined);
   const nodePositionOffset = 28 * GRID_UNIT;
   const updateNodeInternals = useUpdateNodeInternals();
 
@@ -257,6 +266,16 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     [edges, nodes]
   );
 
+  const onNodeDragStart = useCallback(
+    (_: any, draggedNode: Node) => {
+      if (!reactFlowInstance || !reactFlowWrapper.current) return;
+      startDragNode.current = draggedNode;
+      // setStartDragNode((draggedNode) => [...startDragNode, ...draggedNode]);
+
+    },
+    [reactFlowInstance, edges]
+  );
+
   // Dragging existing node onto placeholder
   const onNodeDragStop = useCallback(
     (event: any, draggedNode: Node) => {
@@ -267,6 +286,21 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
+      
+      if (reactFlowInstance.getIntersectingNodes(draggedNode).length > 0) {
+        if (startDragNode.current != undefined) {
+        setNodes((prevNodes) =>
+          prevNodes
+            .map((node) => {
+              if (node.id !== draggedNode.id) return node;
+              node.position.x = startDragNode.current?.position.x ?? 0;
+              node.position.y = startDragNode.current?.position.y ?? 0;
+              return node;
+            })
+        );
+       }
+      }
+
       const matchingPlaceholder = reactFlowInstance.getNodes().find((node) => {
         if (node.type !== "placeholder") return false;
         return (
@@ -307,6 +341,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           }),
         ];
       });
+      startDragNode.current = undefined;
     },
     [reactFlowInstance, edges]
   );
@@ -424,6 +459,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
 
         return newNodes;
       });
+      onNodeAdded();
     },
     [reactFlowInstance, nodes, edges]
   );
@@ -544,6 +580,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         );
         return prevEdges;
       });
+      onNodeDelete();
     },
     [reactFlowInstance, nodes, edges]
   );
@@ -670,7 +707,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   );
 
   return (
-    <div className="graph__body" ref={reactFlowWrapper}>
+    <div className={description.length > 0 ? "graph__bodyWithDescription" : "graph__body"} ref={reactFlowWrapper}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -682,14 +719,14 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
         snapToGrid
         snapGrid={[GRID_UNIT, GRID_UNIT]}
         defaultViewport={{ x: 38 * GRID_UNIT, y: 3 * GRID_UNIT, zoom: 0 }}
-        minZoom={1}
-        maxZoom={1}
+        panOnScroll
         nodeTypes={nodeTypes}
         onInit={setReactFlowInstance}
         onDragOver={onDragOver}
         onDrop={onDrop}
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
+        onNodeDragStart={onNodeDragStart}
         onNodeMouseEnter={(_, node) => {
           setNodes((prevNodes) =>
             prevNodes.map((prevNode) => {
@@ -713,6 +750,8 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
           );
         }}
       >
+        <Controls />
+        <MiniMap />
         <Background color="#D2D3D8" gap={16} lineWidth={2} />
       </ReactFlow>
     </div>
