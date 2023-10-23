@@ -1,5 +1,6 @@
 /data
 /docker
+/tim-db
 .DS_Store
 .vscode
 .env

@@ -4,19 +4,20 @@ services:
     container_name: ruuter
     image: ruuter
     environment:
-      - application.cors.allowedOrigins=http://localhost:3006,http://localhost:3001,http://localhost:8085
+      - application.cors.allowedOrigins=http://localhost:3006,http://localhost:3001,http://localhost:8086
       - application.httpCodesAllowList=200,201,202,203,204,205,206,207,208,226
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
-      - server.port=8085
+      - server.port=8086
       - application.DSL.processedFiletypes=.yml,.yaml,.tmp
     volumes:
       - ./DSL/Ruuter:/DSL
       - ./constants.ini:/app/constants.ini
     ports:
-      - 8085:8085
+      - 8086:8086
     networks:
       - bykstack
+
   resql:
     container_name: resql
     image: resql
@@ -35,6 +36,7 @@ services:
       - ./DSL/Resql/services:/workspace/app/templates/services
     networks:
       - bykstack
+
   resql_users:
     container_name: resql-users
     image: resql
@@ -53,6 +55,7 @@ services:
       - ./DSL/Resql/users:/workspace/app/templates/users
     networks:
       - bykstack
+
   database:
     container_name: database
     image: postgres:14.1
@@ -67,6 +70,7 @@ services:
       - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
     networks:
       - bykstack
+
   data_mapper:
     container_name: data_mapper
     image: datamapper-node
@@ -101,21 +105,22 @@ services:
       - 3008:3008
     networks:
       - bykstack
+
   gui_dev:
     container_name: gui_dev
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
-      - REACT_APP_API_URL=http://localhost:8085
+      - REACT_APP_API_URL=http://localhost:8086
       - REACT_APP_TRAINING_MODULE_GUI_BASE_URL=http://localhost:3001
       - PORT=3006
       - REACT_APP_APP_PORT=3006
-      - REACT_APP_MENU_BASE_URL=http://localhost:8085
+      - REACT_APP_MENU_BASE_URL=http://localhost:8086
       - REACT_APP_MENU_URL=https://admin.dev.buerokratt.ee
-      - REACT_APP_RUUTER_V1_PRIVATE_API_URL=http://localhost:8085
-      - REACT_APP_RUUTER_V2_PRIVATE_API_URL=http://localhost:8085
-      - REACT_APP_RUUTER_V2_SERVICE_API_URL=http://localhost:8085
-      - REACT_APP_AUTH_BASE_URL=http://localhost:8085
+      - REACT_APP_RUUTER_V1_PRIVATE_API_URL=http://localhost:8086
+      - REACT_APP_RUUTER_V2_PRIVATE_API_URL=http://localhost:8086
+      - REACT_APP_RUUTER_V2_SERVICE_API_URL=http://localhost:8086
+      - REACT_APP_AUTH_BASE_URL=http://localhost:8086
       - REACT_APP_AUTH_PATH=/auth
       - REACT_APP_MENU_PATH=/chat/menu.json
       - REACT_APP_API_PATH=/
@@ -130,6 +135,36 @@ services:
       - ./GUI:/app
     networks:
       - bykstack
+
+  tim:
+    container_name: tim
+    image: tim
+    depends_on:
+      - tim-postgresql
+    ports:
+      - 8085:8085
+    networks:
+      - bykstack
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "512M" # Example memory limit
+
+  tim-postgresql:
+    container_name: tim-postgresql
+    image: postgres:14.1
+    environment:
+      - POSTGRES_USER=tim
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=tim
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - ./tim-db:/var/lib/postgresql/data
+    ports:
+      - 9876:5432
+    networks:
+      - bykstack  
+
   opensearch:
     image: opensearchproject/opensearch:latest
     container_name: opensearch

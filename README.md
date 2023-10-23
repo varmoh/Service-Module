@@ -30,6 +30,12 @@ This repo will primarily contain:
 
 - Navigate to Data Mapper and build the image `docker build -t datamapper-node .`
 
+- Clone [TIM](https://github.com/buerokratt/TIM)
+
+- Go to src -> main -> resources -> application.properties & modify security.allowlist.jwt value to `security.allowlist.jwt=ruuter,resql,resql_users,tim,tim-postgresql,node_server,data_mapper,gui_dev,127.0.0.1,::1`
+
+- Navigate to TIM and build the image `docker build -t tim .`
+
 - Clone [SiGA](https://github.com/open-eid/SiGa)
 
 - Set java version to 11
@@ -139,4 +145,14 @@ COPY server.js .
 RUN npm i -g npm@latest
 RUN npm install
 ENTRYPOINT ["npm","start"]
+```
+### TIM
+
+- if you are running `Locally` then you need to curl the login request or run it on postman first to create and store the cookie in TIM and then on the browser create the cookie manully in the browser with name `customJwtCookie` and the value return from the curl
+the curl request is as follows:
+```
+curl -X POST -H "Content-Type: application/json" -d '{
+  "login": "EE30303039914",
+  "password": ""
+}' http://localhost:8086/login-user
 ```
