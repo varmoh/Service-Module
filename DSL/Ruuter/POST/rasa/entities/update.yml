@@ -5,7 +5,7 @@ assign_values:
 getDomainFile:
   call: http.get
   args:
-    url: http://ruuter:8085/domain-file
+    url: http://ruuter:8086/domain-file
   result: domainData
 
 validateEntities:
@@ -42,7 +42,7 @@ convertJsonToYaml:
 getFileLocations:
   call: http.get
   args:
-    url: http://ruuter:8085/return-file-locations
+    url: http://ruuter:8086/return-file-locations
   result: fileLocations
 
 saveDomainFile:
