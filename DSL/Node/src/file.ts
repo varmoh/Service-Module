@@ -26,6 +26,8 @@ router.post("/write", (req, res) => {
     return;
   }
 
+  fs.mkdir(path.dirname(filename), () => { });
+
   fs.writeFile(filename, content, (err) => {
     if (err) {
       res.status(500).json({ message: "Unable to save file" });
