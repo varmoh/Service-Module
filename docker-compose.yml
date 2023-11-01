@@ -101,6 +101,7 @@ services:
     volumes:
       - ./DSL:/data
       - ./DSL/Node:/app
+      - /app/node_modules
     ports:
       - 3008:3008
     networks:
