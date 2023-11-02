@@ -28,11 +28,15 @@ const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
     }
     if (queryKey.includes('prod')) {
         if (queryKey.includes('cs-get-all-active-chats')) {
-            const {data} = await apiDev.get('sse/'+queryKey[0] as string);
+            const {data} = await apiDev.get('sse/'+ (queryKey[0] as string), {
+                headers: {
+                    "Accept": 'text/event-stream'
+                }});
+            return data;
         } else {
             const {data} = await apiDev.get(queryKey[0] as string);
+            return data;
         }
-        return data;
     }
     if (queryKey[1] === 'prod-2') {
         const { data } = await apiDevV2.get(queryKey[0] as string);
