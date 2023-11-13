@@ -4,11 +4,11 @@ on:
   push:
     branches: [ main ]
     paths:
-      - '.env'
+      - '.env.gui'
 
 jobs:
   PackageDeploy:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04.
 
     steps:
       - uses: actions/checkout@v2
