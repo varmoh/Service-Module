@@ -8,9 +8,14 @@ on:
 
 jobs:
   PackageDeploy:
-    runs-on: ubuntu-22.04.
+    runs-on: ubuntu-latest
 
     steps:
+      - name: Debugging Step
+        run: |
+          echo "Checking runner status..."
+          # Add more debugging commands as needed
+          
       - uses: actions/checkout@v2
 
       - name: Docker Setup BuildX
