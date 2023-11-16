@@ -6,5 +6,6 @@ export type EndpointData = {
   type?: string;
   openApiUrl?: string;
   testEnvUrl?: string;
+  hasTestEnv?: boolean;
   definedEndpoints: EndpointType[];
 };
