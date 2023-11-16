@@ -157,6 +157,7 @@
       "ask": "Küsi otspunktid",
       "body": "Body",
       "error": "Otspunktiga ei olnud võimalik ühendust saada. Kontrolli URL'i ja proovi uuesti.",
+      "success": "URL töötab edukalt",
       "headers": "Headers",
       "insert": "Sisesta API otspunkt..",
       "live": "Live otspunkt",
