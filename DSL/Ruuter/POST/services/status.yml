@@ -114,7 +114,7 @@ getDomainFile:
 mergeIntents:
   call: http.post
   args:
-    url: http://host.docker.internal:3000/merge
+    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/merge"
     body:
       array1: ${[service_name]}
       array2: ${domainData.response.body.response.intents}
@@ -123,7 +123,7 @@ mergeIntents:
 convertDomainJsonToYaml:
   call: http.post
   args:
-    url: http://host.docker.internal:3000/convert/json-to-yaml
+    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/convert/json-to-yaml"
     body:
       version: ${domainData.response.body.response.version}
       intents: ${mergedIntents.response.body}
@@ -138,7 +138,7 @@ convertDomainJsonToYaml:
 saveDomainFile:
   call: http.post
   args:
-    url: http://host.docker.internal:3000/file/write
+    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/file/write"
     body:
       file_path: ${fileLocations.response.body.response.domain_location}
       content: ${domainYaml.response.body.json}
@@ -148,7 +148,7 @@ saveDomainFile:
 add_rule:
   call: http.post
   args:
-    url: host.docker.internal:8080/rasa/rules/add
+    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/rasa/rules/add"
     headers:
       cookie: ""
     body:
@@ -170,7 +170,7 @@ deactivate_service:
 delete_rule:
   call: http.post
   args:
-    url: host.docker.internal:8080/rasa/rules/delete
+    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/rasa/rules/delete"
     headers:
       cookie: ""
     body:
@@ -181,7 +181,7 @@ delete_rule:
 delete_intent:
   call: http.post
   args:
-    url: host.docker.internal:8080/rasa/intents/delete
+    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/rasa/intents/delete"
     headers:
       cookie: ""
     body:

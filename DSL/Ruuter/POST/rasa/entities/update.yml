@@ -5,7 +5,7 @@ assign_values:
 getDomainFile:
   call: http.get
   args:
-    url: http://ruuter:8086/domain-file
+    url: "[#SERVICE_RUUTER]:[#SERVICE_RUUTER_PORT]/domain-file"
   result: domainData
 
 validateEntities:
@@ -17,7 +17,7 @@ validateEntities:
 replaceExistingEntity:
   call: http.post
   args:
-    url: http://host.docker.internal:3000/merge/replace-array-element
+    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/merge/replace-array-element"
     body:
       element: ${parameters.entity_name}
       newValue: ${parameters.entity}
@@ -42,7 +42,7 @@ convertJsonToYaml:
 getFileLocations:
   call: http.get
   args:
-    url: http://ruuter:8086/return-file-locations
+    url: "[#SERVICE_RUUTER]:[#SERVICE_RUUTER_PORT]/return-file-locations"
   result: fileLocations
 
 saveDomainFile:
@@ -88,7 +88,7 @@ convertYamlToJson:
 replaceString:
   call: http.post
   args:
-    url: http://host.docker.internal:3000/convert/string/replace
+    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/convert/string/replace"
     body:
       data: ${intentData.response.body.nlu[0].examples}
       search: "- "
@@ -98,7 +98,7 @@ replaceString:
 splitExamples:
   call: http.post
   args:
-    url: http://host.docker.internal:3000/convert/string/split
+    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/convert/string/split"
     body:
       data: ${replacedString.response.body}
       separator: "\n"
@@ -113,7 +113,7 @@ switchMapFileType:
 mapRegexesData:
   call: http.post
   args:
-    url: http://host.docker.internal:3000/dmapper/get-regex-file
+    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/dmapper/get-regex-file"
     body:
       regex: ${parameters.entity}
       examples: ${splitExamples.response.body}
@@ -123,7 +123,7 @@ mapRegexesData:
 mapIntentsData:
   call: http.post
   args:
-    url: http://host.docker.internal:3000/dmapper/get-intent-file
+    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/dmapper/get-intent-file"
     body:
       intent: ${parameters.entity}
       examples: ${splitExamples.response.body}
