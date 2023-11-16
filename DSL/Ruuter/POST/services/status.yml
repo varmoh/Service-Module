@@ -175,7 +175,7 @@ delete_rule:
       cookie: ""
     body:
       rule: ${service_name}
-  result: delete_intent_result
+  result: delete_rule_result
   next: delete_intent
 
 delete_intent:
@@ -185,7 +185,7 @@ delete_intent:
     headers:
       cookie: ""
     body:
-      intent: ${service_name}
+      name: ${service_name}
   result: delete_intent_result
   next: rename_intent_to_tmp
 
@@ -194,9 +194,9 @@ rename_intent_to_tmp:
   args:
     url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/move"
     body:
-      current_path: "/mock1/data/nlu/removed/${service_name + '_nlu' + old_file_end}"
+      current_path: "/mock1/data/nlu/${service_name + '_nlu' + old_file_end}"
       new_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
-  result: activate_intent_result
+  result: rename_intent_result
   next: return_ok
 
 return_ok:
