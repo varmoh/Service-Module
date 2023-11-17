@@ -1,13 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useNavigation } from "react-router-dom";
 import { Button, Card, FormInput, ApiEndpointCard, FormTextarea, Layout, NewServiceHeader, Track } from "../components";
 import { v4 as uuid } from "uuid";
 import { ROUTES } from "../resources/routes-constants";
 import { Node } from "reactflow";
 import axios from "axios";
 import { getSecretVariables, getTaraAuthResponseVariables, jsonToYml } from "../resources/api-constants";
-import { EndpointData, EndpointEnv, EndpointType, EndpointVariableData, PreDefinedEndpointEnvVariables } from "../types/endpoint";
+import {
+  EndpointData,
+  EndpointEnv,
+  EndpointType,
+  EndpointVariableData,
+  PreDefinedEndpointEnvVariables,
+} from "../types/endpoint";
 import { ToastContext } from "../components/Toast/ToastContext";
 import { Step } from "types/step";
 import { StepType } from "types/step-type.enum";
@@ -43,6 +49,19 @@ const NewServicePage: React.FC = () => {
       return prevVariables;
     });
   }, []);
+
+  useEffect(() => {
+    navigate(location.pathname, {
+      state: {
+        endpoints,
+        secrets,
+        serviceName,
+        availableVariables: availableVariables,
+        flow: location.state?.flow,
+        serviceDescription: description,
+      },
+    });
+  }, [endpoints, secrets, serviceName, availableVariables, location.state?.flow, description]);
 
   const loadSecretVariables = () => {
     axios.get(getSecretVariables()).then((result) => {
@@ -185,8 +204,8 @@ const NewServicePage: React.FC = () => {
         next: "end",
       });
       const result = Object.fromEntries(steps.entries());
-       console.log("hi");
-       console.log(jsonToYml());
+      console.log("hi");
+      console.log(jsonToYml());
       await axios
         .post(
           jsonToYml(),
@@ -199,9 +218,19 @@ const NewServicePage: React.FC = () => {
         )
         .then((r) => {
           console.log(r);
+          toast.open({
+            type: "success",
+            title: t("newService.toast.success"),
+            message: t("newService.toast.savedSuccessfully"),
+          });
         })
         .catch((e) => {
           console.log(e);
+          toast.open({
+            type: "error",
+            title: t("newService.toast.failed"),
+            message: t("newService.toast.saveFailed"),
+          });
         });
     }
   };
@@ -362,7 +391,7 @@ const NewServicePage: React.FC = () => {
     });
     steps.set("return_value", { wrapper: false, return: "${sensitive}" });
     const result = Object.fromEntries(steps.entries());
-    console.log(result)
+    console.log(result);
     await axios
       .post(
         jsonToYml(),

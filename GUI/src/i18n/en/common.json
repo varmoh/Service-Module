@@ -152,7 +152,7 @@
     "test": "Test URL",
     "endpoint": {
       "add": "+ Add API endpoint",
-      "addtestEnv": "+ Add test environment",
+      "addTestEnv": "+ Add test environment",
       "api": "API endpoint",
       "ask": "Ask for endpoints",
       "body": "Body",
@@ -180,7 +180,11 @@
     "uses": "Service uses",
     "toast": {
       "serviceMissingFields": "Service name and description are required",
-      "missingFields": "Missing Fields"
+      "missingFields": "Missing Fields",
+      "savedSuccessfully": "Saved Successfully",
+      "success": "Success",
+      "failed": "Failed",
+      "saveFailed": "Failed to save"
     }
   },
   "serviceFlow": {

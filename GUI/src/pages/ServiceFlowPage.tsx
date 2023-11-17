@@ -122,6 +122,18 @@ const ServiceFlowPage: FC = () => {
   const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
   const [isTestButtonEnabled, setIsTestButtonEnabled] = useState(true);
 
+  useEffect(() => {
+    navigate(location.pathname, {
+      state: {
+        endpoints: location.state.endpoints,
+        secrets: secrets,
+        serviceName: serviceName,
+        availableVariables: availableVariables,
+        flow: JSON.stringify(reactFlowInstance?.toObject()),
+        serviceDescription: serviceDescription,
+      },
+    });
+  }, [location.pathname, nodes, isTestButtonVisible, isTestButtonEnabled, edges]);
 
   const getTemplateDataFromNode = (
     node: Node
@@ -674,137 +686,148 @@ const ServiceFlowPage: FC = () => {
     console.log(nodes);
     console.log(edges);
     try {
-    await saveEndpoints();
-    const allRelations: any[] = [];
-    // find regular edges 1 -> 1
-    edges.forEach((edge) => {
-      const node = nodes.find((node) => node.id === edge.source);
-      const followingNode = nodes.find((node) => node.id === edge.target);
-      if (!node) return;
-      if (node.data.stepType === StepType.Textfield && node.data.message === undefined) {
-        throw new Error(t('toast.missing-textfield-message') ?? 'Error');
-      }
-      if (
-        node.data.stepType === StepType.OpenWebpage &&
-        (node.data.link === undefined ||
-        node.data.linkText === undefined)
-      ) {
-        throw new Error(t("toast.missing-website") ?? "Error");
-      }
-
-      if (
-        node.data.stepType === StepType.FileGenerate &&
-        (node.data.fileName === undefined || node.data.fileContent === undefined)
-      ) {
-        throw new Error(t("toast.missing-file-generation") ?? "Error");
-      }
-      
-      if (node.data.stepType === StepType.Input || followingNode?.type === "placeholder") {
-        if (!allRelations.includes(node.id)) allRelations.push(node.id);
-        return;
-      }
-      allRelations.push(`${edge.source}-${edge.target}`);
-    });
-    // find finishing nodes
-    edges.forEach((edge) => {
-      const current = edges.find((lastEdge) => lastEdge.source === edge.source);
-      const nextStep = edges.find((lastEdge) => lastEdge.source === edge.target);
-      if (!nextStep && current?.type !== "placeholder") allRelations.push(edge.target);
-    });
-
-    const finishedFlow = new Map();
-    finishedFlow.set("get_secrets", {
-      call: "http.get",
-      args: {
-        url: `${process.env.REACT_APP_API_URL}/secrets-with-priority`,
-      },
-      result: "secrets",
-    });
-    allRelations.forEach((r) => {
-      const [parentNodeId, childNodeId] = r.split("-");
-      const parentNode = nodes.find((node) => node.id === parentNodeId);
-      if (
-        !parentNode ||
-        parentNode.type !== "customNode" ||
-        [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
-      )
-        return;
-
-      const childNode = nodes.find((node) => node.id === childNodeId);
-      const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
-      if (parentNode.data.stepType === StepType.Input) {
-        if (parentNode.data.rules === undefined) {
-          throw new Error(t("toast.missing-client_input-rules") ?? "Error");
+      await saveEndpoints();
+      const allRelations: any[] = [];
+      // find regular edges 1 -> 1
+      edges.forEach((edge) => {
+        const node = nodes.find((node) => node.id === edge.source);
+        const followingNode = nodes.find((node) => node.id === edge.target);
+        if (!node) return;
+        if (node.data.stepType === StepType.Textfield && node.data.message === undefined) {
+          throw new Error(t("toast.missing-textfield-message") ?? "Error");
+        }
+        if (
+          node.data.stepType === StepType.OpenWebpage &&
+          (node.data.link === undefined || node.data.linkText === undefined)
+        ) {
+          throw new Error(t("toast.missing-website") ?? "Error");
         }
 
-        const clientInput = `ClientInput_${parentNode.data.clientInputId}`;
-        const clientInputName = `${clientInput}-step`;
-        finishedFlow.set(parentStepName, getTemplate(parentNode, clientInputName, `${clientInput}-assign`));
-        finishedFlow.set(`${clientInput}-assign`, {
-          assign: {
-            [clientInput]: `\${${clientInput}_result.input}`,
-          },
-          next: `${clientInput}-switch`,
-        });
-
-        finishedFlow.set(
-          `${clientInput}-switch`,
-          getSwitchCase(
-            edges
-              .filter((e) => e.source === parentNodeId)
-              .map((e) => {
-                const node = nodes.find((node) => node.id === e.target);
-                if (!node) return e.target;
-                const matchingRule = parentNode.data?.rules?.find(
-                  (_: never, i: number) => `rule ${i + 1}` === node.data.label
-                );
-                const followingNode = nodes.find((n) => n.id === edges.find((edge) => edge.source === node.id)?.target);
-                return {
-                  case:
-                    matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
-                      ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
-                          matchingRule.value
-                        }}`
-                      : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
-                  nextStep:
-                    followingNode?.type === "customNode"
-                      ? `${followingNode.data.stepType}-${followingNode.id}`
-                      : "service-end",
-                };
-              })
-          )
-        );
-        return;
-      }
-      return finishedFlow.set(
-        parentStepName,
-        getTemplate(parentNode, parentStepName, childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId)
-      );
-    });
-    finishedFlow.set("service-end", {
-      wrapper: false,
-      return: "",
-    });
-    console.log(finishedFlow);
-    const result = Object.fromEntries(finishedFlow.entries());
-    await axios
-      .post(
-        createNewService(),
-        { name: serviceName, description: serviceDescription, type: "POST", content: result },
-        {
-          params: {
-            location: "/Ruuter/POST/services/tests.yml",
-          },
+        if (
+          node.data.stepType === StepType.FileGenerate &&
+          (node.data.fileName === undefined || node.data.fileContent === undefined)
+        ) {
+          throw new Error(t("toast.missing-file-generation") ?? "Error");
         }
-      )
-      .then((r) => {
-        console.log(r);
-        setIsTestButtonVisible(true);
-        setIsTestButtonEnabled(true);
-      })
-      .catch((e) => {
-        console.log(e);
+
+        if (node.data.stepType === StepType.Input || followingNode?.type === "placeholder") {
+          if (!allRelations.includes(node.id)) allRelations.push(node.id);
+          return;
+        }
+        allRelations.push(`${edge.source}-${edge.target}`);
       });
+      // find finishing nodes
+      edges.forEach((edge) => {
+        const current = edges.find((lastEdge) => lastEdge.source === edge.source);
+        const nextStep = edges.find((lastEdge) => lastEdge.source === edge.target);
+        if (!nextStep && current?.type !== "placeholder") allRelations.push(edge.target);
+      });
+
+      const finishedFlow = new Map();
+      finishedFlow.set("get_secrets", {
+        call: "http.get",
+        args: {
+          url: `${process.env.REACT_APP_API_URL}/secrets-with-priority`,
+        },
+        result: "secrets",
+      });
+      allRelations.forEach((r) => {
+        const [parentNodeId, childNodeId] = r.split("-");
+        const parentNode = nodes.find((node) => node.id === parentNodeId);
+        if (
+          !parentNode ||
+          parentNode.type !== "customNode" ||
+          [StepType.Rule, StepType.RuleDefinition].includes(parentNode.data.stepType)
+        )
+          return;
+
+        const childNode = nodes.find((node) => node.id === childNodeId);
+        const parentStepName = `${parentNode.data.stepType}-${parentNodeId}`;
+        if (parentNode.data.stepType === StepType.Input) {
+          if (parentNode.data.rules === undefined) {
+            throw new Error(t("toast.missing-client_input-rules") ?? "Error");
+          }
+
+          const clientInput = `ClientInput_${parentNode.data.clientInputId}`;
+          const clientInputName = `${clientInput}-step`;
+          finishedFlow.set(parentStepName, getTemplate(parentNode, clientInputName, `${clientInput}-assign`));
+          finishedFlow.set(`${clientInput}-assign`, {
+            assign: {
+              [clientInput]: `\${${clientInput}_result.input}`,
+            },
+            next: `${clientInput}-switch`,
+          });
+
+          finishedFlow.set(
+            `${clientInput}-switch`,
+            getSwitchCase(
+              edges
+                .filter((e) => e.source === parentNodeId)
+                .map((e) => {
+                  const node = nodes.find((node) => node.id === e.target);
+                  if (!node) return e.target;
+                  const matchingRule = parentNode.data?.rules?.find(
+                    (_: never, i: number) => `rule ${i + 1}` === node.data.label
+                  );
+                  const followingNode = nodes.find(
+                    (n) => n.id === edges.find((edge) => edge.source === node.id)?.target
+                  );
+                  return {
+                    case:
+                      matchingRule && !["Yes", "No"].includes(matchingRule?.condition)
+                        ? `\${${matchingRule.name.replace("{{", "").replace("}}", "")} ${matchingRule.condition} ${
+                            matchingRule.value
+                          }}`
+                        : `\${${clientInput} == ${node.data.label === "rule 1" ? '"Yes"' : '"No"'}}`,
+                    nextStep:
+                      followingNode?.type === "customNode"
+                        ? `${followingNode.data.stepType}-${followingNode.id}`
+                        : "service-end",
+                  };
+                })
+            )
+          );
+          return;
+        }
+        return finishedFlow.set(
+          parentStepName,
+          getTemplate(parentNode, parentStepName, childNode ? `${childNode.data.stepType}-${childNodeId}` : childNodeId)
+        );
+      });
+      finishedFlow.set("service-end", {
+        wrapper: false,
+        return: "",
+      });
+      console.log(finishedFlow);
+      const result = Object.fromEntries(finishedFlow.entries());
+      await axios
+        .post(
+          createNewService(),
+          { name: serviceName, description: serviceDescription, type: "POST", content: result },
+          {
+            params: {
+              location: "/Ruuter/POST/services/tests.yml",
+            },
+          }
+        )
+        .then((r) => {
+          console.log(r);
+          setIsTestButtonVisible(true);
+          setIsTestButtonEnabled(true);
+          toast.open({
+            type: "success",
+            title: t("newService.toast.success"),
+            message: t("newService.toast.savedSuccessfully"),
+          });
+        })
+        .catch((e) => {
+          console.log(e);
+          toast.open({
+            type: "error",
+            title: t("toast.cannot-save-flow"),
+            message: e?.message ?? "",
+          });
+        });
     } catch (e: any) {
       toast.open({
         type: "error",
@@ -849,7 +872,7 @@ const ServiceFlowPage: FC = () => {
     resetStates();
     if (selectedNode?.data.stepType === StepType.FinishingStepEnd) return;
 
-    setNodes((prevNodes) => 
+    setNodes((prevNodes) =>
       prevNodes.map((prevNode) => {
         if (prevNode.id !== selectedNode!.id) return prevNode;
         if (
@@ -860,7 +883,7 @@ const ServiceFlowPage: FC = () => {
           prevNode.data.fileContent != updatedNode.data.fileContent
         ) {
           setIsTestButtonEnabled(false);
-        };
+        }
         return {
           ...prevNode,
           data: {

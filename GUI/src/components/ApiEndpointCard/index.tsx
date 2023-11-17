@@ -36,12 +36,16 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEnd
     setEndpoints((pe) => [...pe]);
   }, [endpointName]);
 
+  useEffect(() => {
+    if (endpoint.hasTestEnv) setTestEnvExists(true);
+  }, [endpoint.hasTestEnv]);
+
   return (
     <Tabs.Root
       defaultValue={EndpointEnv.Live}
       onValueChange={(value) => {
         setSelectedTab(value as EndpointEnv);
-        if (value === EndpointEnv.Test) setTestEnvExists(true);
+        if (value === EndpointEnv.Test) endpoint.hasTestEnv = true;
       }}
       className="tab-group"
     >
