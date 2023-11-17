@@ -179,7 +179,11 @@
     "uses": "Teenus kasutab",
     "toast": {
       "serviceMissingFields": "Nõutav on teenuse nimi ja kirjeldus",
-      "missingFields": "Puuduvad väljad"
+      "missingFields": "Puuduvad väljad",
+      "savedSuccessfully": "Salvestatud edukalt",
+      "success": "Edu",
+      "failed": "Ebaõnnestunud",
+      "saveFailed": "Salvestamine ebaõnnestus"
     }
   },
   "serviceFlow": {

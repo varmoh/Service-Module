@@ -179,7 +179,11 @@
     "uses": "Service uses",
     "toast": {
       "serviceMissingFields": "Service name and description are required",
-      "missingFields": "Missing Fields"
+      "missingFields": "Missing Fields",
+      "savedSuccessfully": "Saved Successfully",
+      "success": "Success",
+      "failed": "Failed",
+      "saveFailed": "Failed to save"
     }
   },
   "serviceFlow": {
