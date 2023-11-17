@@ -157,6 +157,7 @@
       "ask": "Ask for endpoints",
       "body": "Body",
       "error": "No response from endpoint. Please check URL and try again",
+      "success": "Url is working successfully",
       "headers": "Headers",
       "insert": "Insert API endpoint..",
       "live": "Live endpoint",
