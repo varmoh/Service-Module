@@ -56,20 +56,20 @@ services:
     networks:
       - bykstack
 
-  database:
-    container_name: database
-    image: postgres:14.1
-    environment:
-      - POSTGRES_USER=byk
-      - POSTGRES_PASSWORD=01234
-      - POSTGRES_MULTIPLE_DATABASES=users_db,services_db
-    ports:
-      - 5433:5432
-    volumes:
-      - ./data:/var/lib/postgresql/data
-      - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
-    networks:
-      - bykstack
+#  database:
+#    container_name: database
+#    image: postgres:14.1
+#    environment:
+#      - POSTGRES_USER=byk
+#      - POSTGRES_PASSWORD=01234
+#      - POSTGRES_MULTIPLE_DATABASES=users_db,services_db
+#    ports:
+#      - 5433:5432
+#    volumes:
+#      - ./data:/var/lib/postgresql/data
+#      - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
+#    networks:
+#      - bykstack
 
   data_mapper:
     container_name: data_mapper
