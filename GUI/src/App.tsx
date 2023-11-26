@@ -4,23 +4,26 @@ import { BrowserRouter } from 'react-router-dom'
 import { ToastProvider } from './components/Toast/ToastContext'
 import RootComponent from './RootComponent'
 import { store as reducer} from './store/reducers/store'
-import useUserInfoStore from "./store/store";
+import useStore from "./store/store";
 import {useQuery} from "@tanstack/react-query";
 import {UserInfo} from "./types/userInfo";
 
 const App: React.FC = () => {
-    const store = useUserInfoStore();
     if(import.meta.env.REACT_APP_LOCAL === 'true') {
-
         const { data } = useQuery<UserInfo>({
             queryKey: ['cs-custom-jwt-userinfo', 'prod'],
-            onSuccess: (res: any) => store.setUserInfo(res)
+            onSuccess: (res: any) => useStore.getState().setUserInfo(res)
         })
     } else {
         const { data: userInfo } = useQuery<UserInfo>({
             queryKey: [import.meta.env.REACT_APP_AUTH_PATH, 'auth'],
-            onSuccess: (data: { data: { custom_jwt_userinfo: UserInfo } }) =>
-                store.setUserInfo(data.data.custom_jwt_userinfo),
+            onSuccess: (data: { data: { custom_jwt_userinfo: UserInfo } }) => {
+                localStorage.setItem(
+                    'exp',
+                    data.data.custom_jwt_userinfo.JWTExpirationTimestamp
+                );
+                return useStore.getState().setUserInfo(data.data.custom_jwt_userinfo);
+            }
         });
     }
 

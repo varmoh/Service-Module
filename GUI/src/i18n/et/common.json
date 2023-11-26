@@ -157,6 +157,7 @@
       "ask": "Küsi otspunktid",
       "body": "Body",
       "error": "Otspunktiga ei olnud võimalik ühendust saada. Kontrolli URL'i ja proovi uuesti.",
+      "success": "URL töötab edukalt",
       "headers": "Headers",
       "insert": "Sisesta API otspunkt..",
       "live": "Live otspunkt",
@@ -179,7 +180,11 @@
     "uses": "Teenus kasutab",
     "toast": {
       "serviceMissingFields": "Nõutav on teenuse nimi ja kirjeldus",
-      "missingFields": "Puuduvad väljad"
+      "missingFields": "Puuduvad väljad",
+      "savedSuccessfully": "Salvestatud edukalt",
+      "success": "Edu",
+      "failed": "Ebaõnnestunud",
+      "saveFailed": "Salvestamine ebaõnnestus"
     }
   },
   "serviceFlow": {

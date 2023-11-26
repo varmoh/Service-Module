@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MdErrorOutline } from "react-icons/md";
 import { v4 as uuid } from "uuid";
@@ -13,6 +13,7 @@ import {
   PreDefinedEndpointEnvVariables,
 } from "../../../../types/endpoint";
 import { RequestVariablesTabsRowsData, RequestVariablesTabsRawData } from "../../../../types/request-variables";
+import { ToastContext } from "components/Toast/ToastContext";
 
 type EndpointCustomProps = {
   endpoint: EndpointData;
@@ -33,8 +34,8 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
 }) => {
   const { t } = useTranslation();
   const [urlError, setUrlError] = useState<string>();
-  const [showContent, setShowContent] = useState<boolean>(!!endpoint.definedEndpoints[0]?.url);
   const [key, setKey] = useState<number>(0);
+  const toast = useContext(ToastContext);
 
   // initial endpoint data
   if (endpoint.definedEndpoints.length === 0) {
@@ -169,9 +170,12 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
                   });
                 }
                 setUrlError(undefined);
-                setShowContent(true);
+                toast.open({
+                  type: "success",
+                  title: t("newService.endpoint.success"),
+                  message: "",
+                });
               } catch (e) {
-                setShowContent(false);
                 setUrlError(t("newService.endpoint.error") ?? undefined);
               }
             }}
@@ -188,19 +192,17 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
           </div>
         </div>
       )}
-      {showContent && (
-        <RequestVariables
-          key={key}
-          requestValues={requestValues}
-          updateEndpointData={updateEndpointData}
-          updateEndpointRawData={updateEndpointRawData}
-          isLive={isLive}
-          endpointData={endpoint.definedEndpoints[0]}
-          requestTab={requestTab}
-          setRequestTab={setRequestTab}
-          setEndpoints={setEndpoints}
-        />
-      )}
+      <RequestVariables
+        key={key}
+        requestValues={requestValues}
+        updateEndpointData={updateEndpointData}
+        updateEndpointRawData={updateEndpointRawData}
+        isLive={isLive}
+        endpointData={endpoint.definedEndpoints[0]}
+        requestTab={requestTab}
+        setRequestTab={setRequestTab}
+        setEndpoints={setEndpoints}
+      />
     </Track>
   );
 };

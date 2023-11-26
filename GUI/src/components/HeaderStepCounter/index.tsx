@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import { Track } from "..";
 import "./HeaderStepCounter.scss";
 import Step from "./HeaderStep";
@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../resources/routes-constants";
 import { EndpointData, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
+import { ToastContext } from "components/Toast/ToastContext";
 
 type StepCounterProps = {
   activeStep: number;
@@ -28,6 +29,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const toast = useContext(ToastContext);
 
   return (
     <Track className="header-step-counter" gap={24}>
@@ -53,18 +55,26 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
         step={3}
         activeStep={activeStep}
         name={t("newService.serviceFlowCreation")}
-        onClick={() =>
-          navigate(ROUTES.FLOW_ROUTE, {
-            state: {
-              availableVariables,
-              endpoints,
-              flow,
-              serviceDescription,
-              serviceName,
-              secrets,
-            },
-          })
-        }
+        onClick={() => {
+          if (serviceName && serviceDescription) {
+            navigate(ROUTES.FLOW_ROUTE, {
+              state: {
+                availableVariables,
+                endpoints,
+                flow,
+                serviceDescription,
+                serviceName,
+                secrets,
+              },
+            });
+          } else {
+            toast.open({
+              type: "error",
+              title: t("newService.toast.missingFields"),
+              message: t("newService.toast.serviceMissingFields"),
+            });
+          }
+        }}
       />
     </Track>
   );
