@@ -88,6 +88,21 @@ activate_service:
       new_path: "/Ruuter/${ruuter_type}/services/active/${name}.yml"
   result: activate_service_result
 
+check_intent_file_exists:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/check"
+    body:
+      file_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
+  result: intent_file_exists_result
+  next: validate_intent_file_exists  
+
+validate_intent_file_exists:
+  switch:
+    - condition: ${!!intent_file_exists_result.response.body}
+      next: activate_intent_file
+  next: return_ok
+
 activate_intent_file:
   call: http.post
   args:
@@ -187,7 +202,22 @@ delete_intent:
     body:
       name: ${service_name}
   result: delete_intent_result
-  next: rename_intent_to_tmp
+  next: check_if_intent_file_exists
+
+check_if_intent_file_exists:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/check"
+    body:
+      file_path: "/mock1/data/nlu/${service_name + '_nlu' + old_file_end}"
+  result: intent_file_exists_res
+  next: validate_if_intent_file_exists  
+
+validate_if_intent_file_exists:
+  switch:
+    - condition: ${!!intent_file_exists_res.response.body}
+      next: rename_intent_to_tmp
+  next: return_ok
 
 rename_intent_to_tmp:
   call: http.post

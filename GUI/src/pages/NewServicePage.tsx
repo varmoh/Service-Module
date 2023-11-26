@@ -204,7 +204,6 @@ const NewServicePage: React.FC = () => {
         next: "end",
       });
       const result = Object.fromEntries(steps.entries());
-      console.log("hi");
       console.log(jsonToYml());
       await axios
         .post(
