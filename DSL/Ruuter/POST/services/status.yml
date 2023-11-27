@@ -88,6 +88,21 @@ activate_service:
       new_path: "/Ruuter/${ruuter_type}/services/active/${name}.yml"
   result: activate_service_result
 
+check_intent_file_exists:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/check"
+    body:
+      file_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
+  result: intent_file_exists_result
+  next: validate_intent_file_exists  
+
+validate_intent_file_exists:
+  switch:
+    - condition: ${!!intent_file_exists_result.response.body}
+      next: activate_intent_file
+  next: return_ok
+
 activate_intent_file:
   call: http.post
   args:
@@ -114,7 +129,7 @@ getDomainFile:
 mergeIntents:
   call: http.post
   args:
-    url: http://host.docker.internal:3000/merge
+    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/merge"
     body:
       array1: ${[service_name]}
       array2: ${domainData.response.body.response.intents}
@@ -123,7 +138,7 @@ mergeIntents:
 convertDomainJsonToYaml:
   call: http.post
   args:
-    url: http://host.docker.internal:3000/convert/json-to-yaml
+    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/convert/json-to-yaml"
     body:
       version: ${domainData.response.body.response.version}
       intents: ${mergedIntents.response.body}
@@ -138,7 +153,7 @@ convertDomainJsonToYaml:
 saveDomainFile:
   call: http.post
   args:
-    url: http://host.docker.internal:3000/file/write
+    url: "[#TRAINING_NODE]:[#TRAINING_NODE_PORT]/file/write"
     body:
       file_path: ${fileLocations.response.body.response.domain_location}
       content: ${domainYaml.response.body.json}
@@ -148,7 +163,7 @@ saveDomainFile:
 add_rule:
   call: http.post
   args:
-    url: host.docker.internal:8080/rasa/rules/add
+    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/rasa/rules/add"
     headers:
       cookie: ""
     body:
@@ -170,33 +185,48 @@ deactivate_service:
 delete_rule:
   call: http.post
   args:
-    url: host.docker.internal:8080/rasa/rules/delete
+    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/rasa/rules/delete"
     headers:
       cookie: ""
     body:
       rule: ${service_name}
-  result: delete_intent_result
+  result: delete_rule_result
   next: delete_intent
 
 delete_intent:
   call: http.post
   args:
-    url: host.docker.internal:8080/rasa/intents/delete
+    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/rasa/intents/delete"
     headers:
       cookie: ""
     body:
-      intent: ${service_name}
+      name: ${service_name}
   result: delete_intent_result
-  next: rename_intent_to_tmp
+  next: check_if_intent_file_exists
+
+check_if_intent_file_exists:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/check"
+    body:
+      file_path: "/mock1/data/nlu/${service_name + '_nlu' + old_file_end}"
+  result: intent_file_exists_res
+  next: validate_if_intent_file_exists  
+
+validate_if_intent_file_exists:
+  switch:
+    - condition: ${!!intent_file_exists_res.response.body}
+      next: rename_intent_to_tmp
+  next: return_ok
 
 rename_intent_to_tmp:
   call: http.post
   args:
     url: "[#SERVICE_NODE]:[#SERVICE_NODE_PORT]/file/move"
     body:
-      current_path: "/mock1/data/nlu/removed/${service_name + '_nlu' + old_file_end}"
+      current_path: "/mock1/data/nlu/${service_name + '_nlu' + old_file_end}"
       new_path: "/mock1/data/nlu/removed/${service_name}_nlu.tmp"
-  result: activate_intent_result
+  result: rename_intent_result
   next: return_ok
 
 return_ok:

@@ -18,6 +18,21 @@ services:
     networks:
       - bykstack
 
+  database:
+    container_name: database
+    image: postgres:14.1
+    environment:
+      - POSTGRES_USER=byk
+      - POSTGRES_PASSWORD=01234
+      - POSTGRES_MULTIPLE_DATABASES=users_db,services_db
+    ports:
+      - 5433:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
+    networks:
+      - bykstack
+
   resql:
     container_name: resql
     image: resql
@@ -55,21 +70,6 @@ services:
       - ./DSL/Resql/users:/workspace/app/templates/users
     networks:
       - bykstack
-
-#  database:
-#    container_name: database
-#    image: postgres:14.1
-#    environment:
-#      - POSTGRES_USER=byk
-#      - POSTGRES_PASSWORD=01234
-#      - POSTGRES_MULTIPLE_DATABASES=users_db,services_db
-#    ports:
-#      - 5433:5432
-#    volumes:
-#      - ./data:/var/lib/postgresql/data
-#      - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
-#    networks:
-#      - bykstack
 
   data_mapper:
     container_name: data_mapper
@@ -142,6 +142,8 @@ services:
     image: tim
     depends_on:
       - tim-postgresql
+    environment:
+      - SECURITY_ALLOWLIST_JWT=ruuter,resql,resql_users,tim,tim-postgresql,node_server,data_mapper,gui_dev,127.0.0.1,::1
     ports:
       - 8085:8085
     networks:
@@ -164,7 +166,7 @@ services:
     ports:
       - 9876:5432
     networks:
-      - bykstack  
+      - bykstack
 
   opensearch:
     image: opensearchproject/opensearch:latest

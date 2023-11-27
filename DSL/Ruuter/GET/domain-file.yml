@@ -1,7 +1,7 @@
 getFileLocations:
   call: http.get
   args:
-    url: http://ruuter:8086/return-file-locations
+    url: "[#SERVICE_RUUTER]:[#SERVICE_RUUTER_PORT]/return-file-locations"
   result: fileLocations
 
 getDomainFile:

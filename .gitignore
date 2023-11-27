@@ -1,6 +1,9 @@
 /data
 /docker
 /tim-db
+/DSL/Ruuter/POST/services/active
+/DSL/Ruuter/POST/services/draft
+/DSL/Ruuter/POST/services/endpoints
 .DS_Store
 .vscode
 .env

@@ -81,7 +81,7 @@ check_result:
 delete_response:
   call: http.post
   args:
-    url: host.docker.internal:8080/rasa/responses/delete
+    url: "[#TRAINING_RUUTER]:[#TRAINING_RUUTER_PORT]/rasa/responses/delete"
     headers:
       cookie: ""
     body:
