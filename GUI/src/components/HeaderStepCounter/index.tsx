@@ -15,6 +15,7 @@ type StepCounterProps = {
   flow?: string;
   secrets?: { [key: string]: any };
   serviceName?: string;
+  serviceId?: string;
   serviceDescription?: string;
 };
 
@@ -23,6 +24,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
   availableVariables,
   endpoints,
   flow,
+  serviceId,
   serviceDescription,
   secrets,
   serviceName,
@@ -46,6 +48,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
               flow,
               serviceDescription,
               serviceName,
+              serviceId,
               secrets,
             },
           })
@@ -64,6 +67,7 @@ const HeaderStepCounter: FC<StepCounterProps> = ({
                 flow,
                 serviceDescription,
                 serviceName,
+                serviceId,
                 secrets,
               },
             });
