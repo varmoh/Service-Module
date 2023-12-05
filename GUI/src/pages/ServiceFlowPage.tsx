@@ -10,6 +10,7 @@ import apiIconTag from "../assets/images/api-icon-tag.svg";
 import "reactflow/dist/style.css";
 import "./ServiceFlowPage.scss";
 import { StepType, Step, RawData, ConditionRuleType } from "../types";
+import { v4 as uuid } from "uuid";
 import {
   EndpointData,
   EndpointEnv,
@@ -106,6 +107,7 @@ const ServiceFlowPage: FC = () => {
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
   const serviceName = (location.state?.serviceName ?? "").replaceAll(" ", "-");
+  const serviceId = location.state?.serviceId ?? uuid();
   const serviceDescription = location.state?.serviceDescription;
   const secrets: PreDefinedEndpointEnvVariables | undefined = location.state?.secrets;
   const availableVariables: PreDefinedEndpointEnvVariables | undefined = location.state?.availableVariables;
@@ -128,6 +130,7 @@ const ServiceFlowPage: FC = () => {
         endpoints: location.state.endpoints,
         secrets: secrets,
         serviceName: serviceName,
+        serviceId: location.state.serviceId,
         availableVariables: availableVariables,
         flow: JSON.stringify(reactFlowInstance?.toObject()),
         serviceDescription: serviceDescription,
@@ -803,7 +806,7 @@ const ServiceFlowPage: FC = () => {
       await axios
         .post(
           createNewService(),
-          { name: serviceName, description: serviceDescription, type: "POST", content: result },
+          { name: serviceName, serviceId: serviceId, description: serviceDescription, type: "POST", content: result },
           {
             params: {
               location: "/Ruuter/POST/services/tests.yml",
@@ -931,6 +934,7 @@ const ServiceFlowPage: FC = () => {
         flow={JSON.stringify(reactFlowInstance?.toObject())}
         serviceName={serviceName}
         serviceDescription={serviceDescription}
+        serviceId={serviceId}
         secrets={secrets}
         continueOnClick={() => navigate(ROUTES.OVERVIEW_ROUTE)}
         isTestButtonVisible={isTestButtonVisible}

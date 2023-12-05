@@ -26,6 +26,7 @@ const NewServicePage: React.FC = () => {
   const [endpoints, setEndpoints] = useState<EndpointData[]>(location.state?.endpoints ?? []);
   const { intentName } = useParams();
   const [serviceName, setServiceName] = useState<string>(location.state?.serviceName ?? intentName ?? "");
+  const [serviceId] = useState<string>(location.state?.serviceId ?? uuid());
   const [description, setDescription] = useState<string>(location.state?.serviceDescription ?? "");
   const [secrets, setSecrets] = useState<PreDefinedEndpointEnvVariables>(location.state?.secrets ?? {});
   const onDelete = (id: string) => {
@@ -56,6 +57,7 @@ const NewServicePage: React.FC = () => {
         endpoints,
         secrets,
         serviceName,
+        serviceId,
         availableVariables: availableVariables,
         flow: location.state?.flow,
         serviceDescription: description,
@@ -551,6 +553,7 @@ const NewServicePage: React.FC = () => {
           secrets={secrets}
           serviceDescription={description}
           serviceName={serviceName}
+          serviceId={serviceId}
           continueOnClick={() => {
             if (serviceName && description) {
               navigate(ROUTES.FLOW_ROUTE, {
@@ -558,6 +561,7 @@ const NewServicePage: React.FC = () => {
                   endpoints,
                   secrets,
                   serviceName,
+                  serviceId,
                   availableVariables: availableVariables,
                   flow: location.state?.flow,
                   serviceDescription: description,
