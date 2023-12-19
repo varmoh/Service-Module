@@ -1,10 +1,14 @@
-request_explain:
-  call: http.post
-  args:
-    url: "[#SERVICE_RUUTER]:[#SERVICE_RUUTER_PORT]/mocks/services/requests/explain"
-    body: {}
-  result: result
+# request_explain:
+#   call: http.post
+#   args:
+#     url: "[#SERVICE_RUUTER]:[#SERVICE_RUUTER_PORT]/mocks/services/requests/explain"
+#     body: {}
+#   result: result
+
+# return_value:
+#   wrapper: false
+#   return: ${result.response.body}
 
 return_value:
   wrapper: false
-  return: ${result.response.body}
+  return: "not implemented yet"
