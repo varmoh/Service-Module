@@ -91,10 +91,16 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
     onSave(updatedNode);
   };
 
-  const fetchExplainRequestJson = async () => {
+  const handleJsonRequestClick = async () => {
+    if(isJsonRequestVisible) {
+      setIsJsonRequestVisible(false);
+      return;
+    }
+    
     try {
       const response = await axios.post(servicesRequestsExplain(), {});
       setJsonRequestContent(response.data);
+      setIsJsonRequestVisible(true);
     } catch (error) {
       console.log("Error: ", error);
     }
@@ -132,10 +138,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
         <Track direction="horizontal" gap={16} justify="between" style={{ width: "100%" }}>
           <Button
             appearance="text"
-            onClick={async () => {
-              await fetchExplainRequestJson();
-              setIsJsonRequestVisible(!isJsonRequestVisible);
-            }}
+            onClick={handleJsonRequestClick}
           >
             {getJsonRequestButtonTitle()}
           </Button>
