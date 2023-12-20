@@ -112,6 +112,14 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
     setTextfieldMessagePlaceholders({});
   };
 
+  const getJsonRequestButtonTitle = () => {
+    if(selectedTab === t("serviceFlow.tabs.test")) 
+      return "";
+    if(isJsonRequestVisible) 
+      return t("serviceFlow.popup.hideJsonRequest");
+    return t("serviceFlow.popup.showJsonRequest");
+  }
+
   return (
     <Popup
       style={{ maxWidth: 700 }}
@@ -129,7 +137,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
               setIsJsonRequestVisible(!isJsonRequestVisible);
             }}
           >
-            {t(isJsonRequestVisible ? "serviceFlow.popup.hideJsonRequest" : "serviceFlow.popup.showJsonRequest")}
+            {getJsonRequestButtonTitle()}
           </Button>
           <Track gap={16}>
             {!isReadonly && (
