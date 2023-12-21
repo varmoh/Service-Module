@@ -20,6 +20,7 @@ import { Node } from "reactflow";
 import RasaRulesContent from "./RasaRulesContent";
 import { ConditionRuleType, StepType } from "../../types";
 import "./styles.scss";
+import { useLocation } from "react-router-dom";
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
 
 interface FlowElementsPopupProps {
@@ -61,6 +62,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   // StepType.FileGenerate
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
+  const location = useLocation();
 
   if (!node) return <></>;
 
@@ -100,11 +102,13 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
     }
 
     try {
-      const response = await axios.post(servicesRequestsExplain(), {});
-      setJsonRequestContent(response.data);
+      const endpoint = location.state?.endpoints.find((e) => e.name === node.data.label);
+      setJsonRequestContent(endpoint);
+      // const response = await axios.post(servicesRequestsExplain(), {});
+      // setJsonRequestContent(response.data);
       setIsJsonRequestVisible(true);
     } catch (error) {
-      console.log("Error: ", error);
+      console.error("Error: ", error);
     }
   };
 
