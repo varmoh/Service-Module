@@ -46,6 +46,8 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
 
+  const isUserDefinedNode = node?.data?.stepType === 'user-defined';
+
   useEffect(() => {
     if (node) node.data.rules = rules;
   }, [rules]);
@@ -96,7 +98,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
       setIsJsonRequestVisible(false);
       return;
     }
-    
+
     try {
       const response = await axios.post(servicesRequestsExplain(), {});
       setJsonRequestContent(response.data);
@@ -119,7 +121,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   };
 
   const getJsonRequestButtonTitle = () => {
-    if(selectedTab === t("serviceFlow.tabs.test")) 
+    if(!isUserDefinedNode || selectedTab === t("serviceFlow.tabs.test")) 
       return "";
     if(isJsonRequestVisible) 
       return t("serviceFlow.popup.hideJsonRequest");

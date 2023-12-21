@@ -958,12 +958,12 @@ const ServiceFlowPage: FC = () => {
       </h5>
       <FlowElementsPopup
         availableVariables={availableVariables}
-        onClose={() => handlePopupClose()}
-        onSave={(updatedNode: Node) => {
-          handlePopupSave(updatedNode);
-        }}
+        onClose={handlePopupClose}
+        onSave={handlePopupSave}
         onRulesUpdate={(rules, rulesData) => {
-          if (selectedNode?.data.stepType === StepType.Input) setUpdatedRules({ rules, rulesData });
+          if (selectedNode?.data.stepType === StepType.Input) {
+            setUpdatedRules({ rules, rulesData });
+          }
           resetStates();
         }}
         node={selectedNode}
