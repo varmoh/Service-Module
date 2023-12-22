@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 
 import * as Tabs from "@radix-ui/react-tabs";
 import { Button, EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Icon, Track } from "..";
@@ -8,16 +8,14 @@ import { MdDeleteOutline } from "react-icons/md";
 import "./ApiEndpointCard.scss";
 import { RequestTab } from "../../types";
 import { EndpointData, EndpointEnv, EndpointTab, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
+import useServiceStore from "store/new-services.store";
 
 type EndpointCardProps = {
-  onDelete: () => void;
-  onNameChange: (endpointId: string, oldName: string, newName: string) => void;
   endpoint: EndpointData;
-  setEndpoints: React.Dispatch<React.SetStateAction<EndpointData[]>>;
-  requestValues: PreDefinedEndpointEnvVariables;
 };
 
-const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEndpoints, endpoint, requestValues }) => {
+const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint }) => {
+  const { onNameChange, deleteEndpoint, changeServiceEndpointType, getAvailableRequestValues } = useServiceStore();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
@@ -32,13 +30,10 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEnd
   const getTabTriggerClasses = (tab: EndpointEnv) => `tab-group__tab-btn ${selectedTab === tab ? "active" : ""}`;
 
   useEffect(() => {
-    endpoint.name = endpointName;
-    setEndpoints((pe) => [...pe]);
-  }, [endpointName]);
-
-  useEffect(() => {
     if (endpoint.hasTestEnv) setTestEnvExists(true);
   }, [endpoint.hasTestEnv]);
+
+  const requestValues = useMemo(() => getAvailableRequestValues(endpoint.id),[]);
 
   return (
     <Tabs.Root
@@ -59,7 +54,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEnd
           </Tabs.Trigger>
         </Tabs.List>
         <>
-          <Button appearance="text" onClick={onDelete} style={{ color: "#9799A4" }}>
+          <Button appearance="text" onClick={() => deleteEndpoint(endpoint.id)} style={{ color: "#9799A4" }}>
             <Icon icon={<MdDeleteOutline />} size="medium" />
             {t("overview.delete")}
           </Button>
@@ -79,15 +74,7 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEnd
                   placeholder={t("global.choose") ?? ""}
                   onSelectionChange={(selection) => {
                     setOption(selection);
-                    endpoint.definedEndpoints = [];
-                    setEndpoints((prevEndpoints) => {
-                      prevEndpoints.map((prevEndpoint) => {
-                        if (prevEndpoint.id !== endpoint.id) return prevEndpoint;
-                        prevEndpoint.type = selection?.value;
-                        return prevEndpoint;
-                      });
-                      return prevEndpoints;
-                    });
+                    changeServiceEndpointType(endpoint.id, selection?.value ?? '');
                   }}
                   defaultValue={option?.value}
                 />
@@ -112,9 +99,8 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEnd
                   endpoint={endpoint}
                   isLive={selectedTab === EndpointEnv.Live}
                   requestTab={requestTab}
-                  requestValues={requestValues}
-                  setEndpoints={setEndpoints}
                   setRequestTab={setRequestTab}
+                  requestValues={requestValues}
                 />
               )}
               {option?.value === "custom" && (
@@ -122,9 +108,8 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ onDelete, onNameChange, setEnd
                   endpoint={endpoint}
                   isLive={selectedTab === EndpointEnv.Live}
                   requestTab={requestTab}
-                  requestValues={requestValues}
-                  setEndpoints={setEndpoints}
                   setRequestTab={setRequestTab}
+                  requestValues={requestValues}
                 />
               )}
             </Track>

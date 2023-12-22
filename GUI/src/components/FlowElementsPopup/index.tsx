@@ -102,15 +102,38 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
     }
 
     try {
-      const endpoint = location.state?.endpoints.find((e) => e.name === node.data.label);
-      setJsonRequestContent(endpoint);
-      // const response = await axios.post(servicesRequestsExplain(), {});
-      // setJsonRequestContent(response.data);
+      const endpoint = location.state?.endpoints.find((e: any) => e.name === node.data.label)?.definedEndpoints[0];
+      console.log(endpoint)
+      if(endpoint.type === 'openApi') {
+        setJsonRequestContent(endpoint.openApiJson);
+        setIsJsonRequestVisible(true);
+        return;
+      }
+      const response = await axios.post(servicesRequestsExplain(), {
+        url: endpoint.url,
+        method: endpoint.methodType,
+        headers: extractMapValues(endpoint.headers),
+        body: extractMapValues(endpoint.body),
+        params: extractMapValues(endpoint.params),
+      });
+      setJsonRequestContent(response.data);
       setIsJsonRequestVisible(true);
     } catch (error) {
       console.error("Error: ", error);
     }
   };
+
+  function extractMapValues(element: any) {
+    if(element.rawData && element.rawData.length > 0) {
+      return element.rawData.value; //  element.rawData.testValue
+    }
+
+    let result: any = {};
+    for (const entry of element.variables) {
+      result = { ...result, [entry.name]: entry.value };
+    }
+    return result;
+  }
 
   const resetStates = () => {
     setSelectedTab(null);
