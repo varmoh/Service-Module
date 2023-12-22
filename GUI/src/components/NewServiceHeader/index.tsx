@@ -2,7 +2,7 @@ import { t } from "i18next";
 import React, { FC } from "react";
 import { Button, HeaderStepCounter, Track } from "..";
 import { EndpointData, PreDefinedEndpointEnvVariables } from "../../types/endpoint";
-import "../Header/Header.scss";
+import "@buerokratt-ria/header/src/header/Header.scss";
 
 type NewServiceHeaderProps = {
   activeStep: number;
@@ -14,6 +14,7 @@ type NewServiceHeaderProps = {
   secrets?: { [key: string]: any };
   serviceName?: string;
   serviceDescription?: string;
+  isCommon?: boolean;
   serviceId?: string;
   isSaveButtonEnabled?: boolean;
   isTestButtonVisible?: boolean;
@@ -32,6 +33,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
   serviceDescription,
   serviceName,
   serviceId,
+  isCommon = false,
   isSaveButtonEnabled = true,
   isTestButtonVisible = false,
   isTestButtonEnabled = true,
@@ -51,6 +53,7 @@ const NewServiceHeader: FC<NewServiceHeaderProps> = ({
             serviceDescription={serviceDescription}
             serviceName={serviceName}
             serviceId={serviceId}
+            isCommon={isCommon}
           />
           <Button onClick={saveDraftOnClick} appearance="secondary" disabled={!isSaveButtonEnabled}>
             {t("newService.saveDraft")}
