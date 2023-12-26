@@ -22,6 +22,7 @@ import { ConditionRuleType, StepType } from "../../types";
 import "./styles.scss";
 import { useLocation } from "react-router-dom";
 import { PreDefinedEndpointEnvVariables } from "../../types/endpoint";
+import useServiceStore from "store/new-services.store";
 
 interface FlowElementsPopupProps {
   node: any;
@@ -48,6 +49,8 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
 
   const isUserDefinedNode = node?.data?.stepType === 'user-defined';
+
+  const { endpoints } = useServiceStore();
 
   useEffect(() => {
     if (node) node.data.rules = rules;
@@ -102,10 +105,14 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
     }
 
     try {
-      const endpoint = location.state?.endpoints.find((e: any) => e.name === node.data.label)?.definedEndpoints[0];
-      console.log(endpoint)
+      const endpoint = endpoints.find((e: any) => e.name === node.data.label)?.definedEndpoints[0];
+      console.log(node.data, endpoint, endpoints)
+      if(!endpoint){
+        return;
+      }
+
       if(endpoint.type === 'openApi') {
-        setJsonRequestContent(endpoint.openApiJson);
+        // setJsonRequestContent(endpoint.openApiJson);
         setIsJsonRequestVisible(true);
         return;
       }

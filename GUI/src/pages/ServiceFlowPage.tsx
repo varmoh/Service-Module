@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useContext, useEffect, useState } from "react";
+import { CSSProperties, FC, useContext, useEffect, useMemo, useState } from "react";
 
 import { MarkerType, Node, ReactFlowInstance, ReactFlowProvider, useEdgesState, useNodesState } from "reactflow";
 import { Box, Collapsible, NewServiceHeader, Track, FlowElementsPopup } from "../components";
@@ -21,6 +21,7 @@ import {
 import axios from "axios";
 import { createNewService, jsonToYml, testDraftService } from "../resources/api-constants";
 import { ToastContext } from "../components/Toast/ToastContext";
+import useServiceStore from "store/new-services.store";
 
 const initialPlaceholder = {
   id: "2",
@@ -106,13 +107,12 @@ const ServiceFlowPage: FC = () => {
   });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
-  const serviceName = (location.state?.serviceName ?? "").replaceAll(" ", "-");
-  const serviceId = location.state?.serviceId ?? uuid();
-  const serviceDescription = location.state?.serviceDescription;
-  const isCommon = location.state?.isCommon;
-  const secrets: PreDefinedEndpointEnvVariables | undefined = location.state?.secrets;
-  const availableVariables: PreDefinedEndpointEnvVariables | undefined = location.state?.availableVariables;
+  const { endpoints, serviceId, isCommon, description, secrets, availableVariables, serviceNameDashed } = useServiceStore();
+
+  const serviceName = useMemo(() => serviceNameDashed(), [useServiceStore.getState().serviceName]);
+
   const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
+  
   const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
   const resetNodes = (): Node[] => {
@@ -130,11 +130,11 @@ const ServiceFlowPage: FC = () => {
       state: {
         endpoints: location.state.endpoints,
         secrets: secrets,
-        serviceName: serviceName,
+        serviceName,
         serviceId: location.state.serviceId,
         availableVariables: availableVariables,
         flow: JSON.stringify(reactFlowInstance?.toObject()),
-        serviceDescription: serviceDescription,
+        serviceDescription: description,
         isCommon: isCommon,
       },
     });
@@ -811,7 +811,7 @@ const ServiceFlowPage: FC = () => {
           {
             name: serviceName,
             serviceId: serviceId,
-            description: serviceDescription,
+            description,
             type: "POST",
             content: result,
             isCommon: isCommon,
@@ -850,7 +850,7 @@ const ServiceFlowPage: FC = () => {
   };
 
   useEffect(() => {
-    const setupEndpoints: EndpointData[] | undefined = location.state?.endpoints;
+    const setupEndpoints: EndpointData[] | undefined = endpoints;
     const elements: Step[] = [];
     setupEndpoints?.forEach((endpoint) => {
       const selectedEndpoint = endpoint.definedEndpoints.find((e) => e.isSelected);
@@ -939,10 +939,9 @@ const ServiceFlowPage: FC = () => {
         activeStep={3}
         availableVariables={availableVariables}
         saveDraftOnClick={saveFlow}
-        endpoints={location.state?.endpoints}
         flow={JSON.stringify(reactFlowInstance?.toObject())}
         serviceName={serviceName}
-        serviceDescription={serviceDescription}
+        serviceDescription={description}
         isCommon={isCommon}
         serviceId={serviceId}
         secrets={secrets}
@@ -964,7 +963,7 @@ const ServiceFlowPage: FC = () => {
           whiteSpace: "nowrap",
         }}
       >
-        {serviceDescription}
+        {description}
       </h5>
       <FlowElementsPopup
         availableVariables={availableVariables}
@@ -1033,7 +1032,7 @@ const ServiceFlowPage: FC = () => {
             setReactFlowInstance={setReactFlowInstance}
             onNodeEdit={setSelectedNode}
             updatedRules={updatedRules}
-            description={serviceDescription}
+            description={description}
             nodes={nodes}
             setNodes={setNodes}
             onNodesChange={onNodesChange}
