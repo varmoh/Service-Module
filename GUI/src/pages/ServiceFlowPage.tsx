@@ -128,14 +128,14 @@ const ServiceFlowPage: FC = () => {
   useEffect(() => {
     navigate(location.pathname, {
       state: {
-        endpoints: location.state.endpoints,
-        secrets: secrets,
+        endpoints,
+        secrets,
         serviceName,
-        serviceId: location.state.serviceId,
-        availableVariables: availableVariables,
+        serviceId,
+        availableVariables,
         flow: JSON.stringify(reactFlowInstance?.toObject()),
         serviceDescription: description,
-        isCommon: isCommon,
+        isCommon,
       },
     });
   }, [location.pathname, nodes, isTestButtonVisible, isTestButtonEnabled, edges]);
