@@ -107,14 +107,19 @@ const ServiceFlowPage: FC = () => {
   });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
-  const { endpoints, serviceId, isCommon, description, secrets, availableVariables, serviceNameDashed } = useServiceStore();
+  const { endpoints, serviceId, isCommon, description, secrets, availableVariables, serviceNameDashed, setFlow } = useServiceStore();
 
   const serviceName = useMemo(() => serviceNameDashed(), [useServiceStore.getState().serviceName]);
+  const flow = useMemo(() => {
+    const flowStr = useServiceStore.getState().flow;
+    if(!flowStr)
+      return undefined;
+    return JSON.parse(flowStr);
+  }, [useServiceStore.getState().flow]);
 
-  const flow = location.state?.flow ? JSON.parse(location.state?.flow) : undefined;
-  
   const [edges, setEdges, onEdgesChange] = useEdgesState(flow ? flow.edges : [initialEdge]);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance>();
+
   const resetNodes = (): Node[] => {
     return flow.nodes.map((n: Node) => {
       if (n.type !== "customNode") return n;
@@ -124,6 +129,10 @@ const ServiceFlowPage: FC = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(flow ? resetNodes() : initialNodes);
   const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
   const [isTestButtonEnabled, setIsTestButtonEnabled] = useState(true);
+
+  useEffect(() => {
+    setFlow(JSON.stringify(reactFlowInstance?.toObject()));
+  }, [reactFlowInstance]);
 
   useEffect(() => {
     navigate(location.pathname, {

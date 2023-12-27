@@ -29,9 +29,10 @@ interface ServiceState {
   getAvailableRequestValues: (endpointId: string) => PreDefinedEndpointEnvVariables;
   onNameChange: (endpointId: string, oldName: string, newName: string) => void;
   changeServiceEndpointType: (id: string, type: string) => void;
-  
-  // TODO: remove this funtion and refactor the code to use more specific functions
+
+  // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
+  setFlow: (flow: string) => void;
 }
 
 const useServiceStore = create<ServiceState>((set, get, store) => ({
@@ -158,6 +159,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       endpoints: callback(state.endpoints)
     }));
   },
+  setFlow: (flow) => set({ flow }),
 }));
 
 export default useServiceStore;
