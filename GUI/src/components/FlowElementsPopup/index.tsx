@@ -105,17 +105,11 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
     }
 
     try {
-      const endpoint = endpoints.find((e: any) => e.name === node.data.label)?.definedEndpoints[0];
-      console.log(node.data, endpoint, endpoints)
-      if(!endpoint){
-        return;
-      }
+      const finder = (e: any) => e.name === node.data.label || node.data.label.includes(e.name);
+      const endpoint = endpoints.find(finder)?.definedEndpoints[0];
 
-      if(endpoint.type === 'openApi') {
-        // setJsonRequestContent(endpoint.openApiJson);
-        setIsJsonRequestVisible(true);
-        return;
-      }
+      if(!endpoint) return;
+      
       const response = await axios.post(servicesRequestsExplain(), {
         url: endpoint.url,
         method: endpoint.methodType,

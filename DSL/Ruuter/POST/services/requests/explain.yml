@@ -1,14 +1,42 @@
-# request_explain:
-#   call: http.post
-#   args:
-#     url: "[#SERVICE_RUUTER]:[#SERVICE_RUUTER_PORT]/mocks/services/requests/explain"
-#     body: {}
-#   result: result
+check_for_body:
+  switch:
+    - condition: ${incoming.body == null}
+      next: missing_parameter
 
-# return_value:
-#   wrapper: false
-#   return: ${result.response.body}
+check_for_required_parameters:
+  switch:
+    - condition: ${incoming.body.url == null || incoming.body.method == null}
+      next: missing_parameter
+  next: check_method
+
+missing_parameter:
+  status: 400
+  return: "required parameters were not provided"
+  next: end
+
+check_method:
+  switch:
+    - condition: ${incoming.body.method.toLowerCase() == 'post'}
+      next: request_explain_post
+  next: request_explain_get
+
+request_explain_get:
+  call: http.get
+  args:
+    url: ${incoming.body.url}
+    # headers: ${incoming.body.headers}
+  result: result
+  next: return_value
+
+request_explain_post:
+  call: http.post
+  args:
+    url: ${incoming.body.url}
+    # body: ${incoming.body.body}
+    # headers: ${incoming.body.headers}
+  result: result
+  next: return_value
 
 return_value:
   wrapper: false
-  return: "not implemented yet"
+  return: ${result.response.body}
