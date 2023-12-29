@@ -11,8 +11,8 @@ check_user_authority:
       next: return_authorized
 
 return_unauthorized:
-  status: 403
-  return: false
+  status: 401
+  return: "unauthorized"
   next: end
 
 return_authorized:

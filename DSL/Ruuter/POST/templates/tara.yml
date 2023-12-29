@@ -31,6 +31,6 @@ return_bad_request:
   next: end
 
 missing_cookie:
-  status: 403
+  status: 401
   return: "no authentication cookie"
   next: end
