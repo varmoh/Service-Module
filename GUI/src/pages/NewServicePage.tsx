@@ -53,8 +53,8 @@ const NewServicePage: React.FC = () => {
 
   const { intentName } = useParams();
   useEffect(() => {
-    if(intentName)
-      changeServiceName(intentName);
+    const name = intentName?.trim();
+    if(name) changeServiceName(name);
   }, [intentName])
 
   useEffect(() => {

@@ -107,7 +107,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
     try {
       const finder = (e: any) => e.name === node.data.label || node.data.label.includes(e.name);
       const endpoint = endpoints.find(finder)?.definedEndpoints[0];
-
+      
       if(!endpoint) return;
       
       const response = await axios.post(servicesRequestsExplain(), {

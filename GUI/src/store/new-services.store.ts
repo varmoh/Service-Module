@@ -74,7 +74,6 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
     const newEndpoint = { id: uuid(), name: "", definedEndpoints: [] };
     set(state => ({ endpoints:[ ...state.endpoints, newEndpoint] }));
   },
-
   loadFlowData: async () => {
     let nodes: Node[] = [];
     if(get().flow) {

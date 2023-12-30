@@ -24,7 +24,6 @@ request_explain_get:
   call: http.get
   args:
     url: ${incoming.body.url}
-    # headers: ${incoming.body.headers}
   result: result
   next: return_value
 
@@ -32,8 +31,6 @@ request_explain_post:
   call: http.post
   args:
     url: ${incoming.body.url}
-    # body: ${incoming.body.body}
-    # headers: ${incoming.body.headers}
   result: result
   next: return_value
 
