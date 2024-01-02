@@ -11,12 +11,14 @@ interface ServiceState {
   serviceName: string;
   serviceId: string;
   description: string;
-  isCommon: boolean;
+  isCommon: boolean,
+  setIsCommon: (isCommon: boolean) => void;
   secrets: PreDefinedEndpointEnvVariables;
   availableVariables: PreDefinedEndpointEnvVariables;
   serviceNameDashed: () => string;
   deleteEndpoint: (id: string) => void;
-  setIsCommon: (isCommon: boolean) => void;
+  isCommonEndpoint: (id: string) => boolean;
+  setIsCommonEndpoint: (id: string, isCommon: boolean) => void;
   setDescription: (description: string) => void;
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => void;
   addProductionVariables: (variables: string[]) => void,
@@ -41,7 +43,6 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   serviceName: '',
   serviceId: uuid(),
   description: '',
-  isCommon: false,
   secrets: { prod: [], test: [] },
   availableVariables: { prod: [], test: [] },
   serviceNameDashed: () => get().serviceName.replace(" ", "-"),
@@ -51,7 +52,22 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   },
   changeServiceName: (name: string) => set({ serviceName: name }),
   setDescription: (description: string) => set({ description }),
+  isCommon: false,
   setIsCommon: (isCommon: boolean) => set({ isCommon }),
+  isCommonEndpoint: (id: string) => {
+    const endpoint = get().endpoints.find(x => x.id === id);
+    return endpoint?.isCommon ?? false;
+  },
+  setIsCommonEndpoint: (id: string, isCommon: boolean) => {
+    const endpoints = get().endpoints.map(x => {
+      if(x.id !== id) return x;
+      return {
+        ...x,
+        isCommon,
+      }
+    })
+    set({ endpoints })
+  },
   setSecrets: (newSecrets: PreDefinedEndpointEnvVariables) => set({ secrets: newSecrets }),
   addProductionVariables: (variables: any) => {
     set(state => ({
@@ -129,11 +145,21 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   onNameChange: (endpointId: string, oldName: string, newName: string) => {
     const endpoint = get().endpoints.find(x => x.id === endpointId);
     const response = endpoint?.definedEndpoints.find(x => x.isSelected)?.response ?? [];
-    const variables = response.map(x => `{{${newName === "" ? x.id : newName}.${x.name}}}`);
+    const variables = response.map(x => `{{${!!newName ? newName : x.id}.${x.name}}}`);
 
     const oldFilteredVariables = get().availableVariables.prod.filter((v) => v.replace("{{", "").split(".")[0] !== oldName);
 
+    const newEndpoints = get().endpoints.map(x => {
+      if(x.id !== endpointId)
+        return x;
+      return {
+        ...x,
+        name: newName,
+      };
+    })
+
     set(state => ({
+      endpoints: newEndpoints,
       availableVariables: {
         prod: [ ...variables, ...oldFilteredVariables ],
         test: state.availableVariables.test,

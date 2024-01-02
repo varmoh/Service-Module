@@ -1,7 +1,7 @@
 import { FC, useEffect, useMemo, useState } from "react";
 
 import * as Tabs from "@radix-ui/react-tabs";
-import { Button, EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Icon, Track } from "..";
+import { Button, EndpointCustom, EndpointOpenAPI, FormInput, FormSelect, Icon, Switch, Track } from "..";
 import { Option } from "../../types/option";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline } from "react-icons/md";
@@ -15,7 +15,14 @@ type EndpointCardProps = {
 };
 
 const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint }) => {
-  const { onNameChange, deleteEndpoint, changeServiceEndpointType, getAvailableRequestValues } = useServiceStore();
+  const { 
+    onNameChange, 
+    deleteEndpoint, 
+    changeServiceEndpointType, 
+    getAvailableRequestValues, 
+    setIsCommonEndpoint,
+    isCommonEndpoint,
+  } = useServiceStore();
   const [selectedTab, setSelectedTab] = useState<EndpointEnv>(EndpointEnv.Live);
   const [endpointName, setEndpointName] = useState<string>(endpoint.name);
   const [testEnvExists, setTestEnvExists] = useState<boolean>(false);
@@ -111,6 +118,20 @@ const ApiEndpointCard: FC<EndpointCardProps> = ({ endpoint }) => {
                   setRequestTab={setRequestTab}
                   requestValues={requestValues}
                 />
+              )}
+              {option?.value && (
+                <Track gap={16}>
+                  <label htmlFor="isCommon">{t("global.common")}</label>
+                  <Switch
+                    name="isCommon"
+                    label=""
+                    onLabel={t("global.yes").toString()}
+                    offLabel={t("global.no").toString()}
+                    value={isCommonEndpoint(endpoint.id)}
+                    checked={isCommonEndpoint(endpoint.id)}
+                    onCheckedChange={value => setIsCommonEndpoint(endpoint.id, value)}
+                  />
+                </Track>
               )}
             </Track>
           </Tabs.Content>
