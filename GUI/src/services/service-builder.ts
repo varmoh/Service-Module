@@ -71,15 +71,21 @@ const getNestedRawData = (data: { [key: string]: any }, key: string, path: strin
 };
 
 // Since we currently cannot mark variables as sensitive from GUI, we set all as sensitive
-const saveEndpointInfo = async (selectedEndpoint: EndpointType, env: EndpointEnv, endpointName: string) => {
-  await saveEndpointConfig(selectedEndpoint, env, endpointName);
+const saveEndpointInfo = async (
+  selectedEndpoint: EndpointType,
+  env: EndpointEnv,
+  endpointName: string,
+  endpoint: EndpointData,
+) => {
+  await saveEndpointConfig(selectedEndpoint, env, endpointName, endpoint);
 
   const steps = new Map();
   steps.set("get-configs", {
     call: "http.post",
     args: {
-      url: `${process.env.REACT_APP_API_URL}/services/endpoints/configs/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-        }-configs`,
+      url: `${process.env.REACT_APP_API_URL}/services/endpoints/configs/${
+        endpoint.isCommon ? "common/" : ""
+      }${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"}-configs`,
       body: {
         params: "${incoming.body.params}",
         headers: "${incoming.body.headers}",
@@ -99,8 +105,9 @@ const saveEndpointInfo = async (selectedEndpoint: EndpointType, env: EndpointEnv
       { result },
       {
         params: {
-          location: `/Ruuter/POST/services/endpoints/info/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-            }-info.yml`,
+          location: `/Ruuter/POST/services/endpoints/info/${endpoint.isCommon ? "common/" : ""}${endpointName}-${
+            env === EndpointEnv.Live ? "prod" : "test"
+          }-info.yml`,
         },
       }
     )
@@ -108,7 +115,12 @@ const saveEndpointInfo = async (selectedEndpoint: EndpointType, env: EndpointEnv
     .catch(console.log);
 };
 
-const saveEndpointConfig = async (endpoint: EndpointType, env: EndpointEnv, endpointName: string) => {
+const saveEndpointConfig = async (
+  endpoint: EndpointType,
+  env: EndpointEnv,
+  endpointName: string,
+  data: EndpointData,
+) => {
   const headers = rawDataIfVariablesMissing(
     endpoint,
     "headers",
@@ -157,8 +169,9 @@ const saveEndpointConfig = async (endpoint: EndpointType, env: EndpointEnv, endp
       { result },
       {
         params: {
-          location: `/Ruuter/POST/services/endpoints/configs/${endpointName}-${env === EndpointEnv.Live ? "prod" : "test"
-            }-configs.yml`,
+          location: `/Ruuter/POST/services/endpoints/configs/${data.isCommon ? "common/" : ""}${endpointName}-${
+            env === EndpointEnv.Live ? "prod" : "test"
+          }-configs.yml`,
         },
       }
     )
@@ -277,7 +290,7 @@ export async function saveEndpoints(endpoints: EndpointData[], serviceName: stri
     const endpointName = `${serviceName.replaceAll(" ", "_")}-${(endpoint.data.name.trim().length ?? 0) > 0 ? endpoint.data?.name.replaceAll(" ", "_") : endpoint.data?.id
       }`;
     for (const env of [EndpointEnv.Live, EndpointEnv.Test]) {
-      await saveEndpointInfo(selectedEndpointType, env, endpointName);
+      await saveEndpointInfo(selectedEndpointType, env, endpointName, endpoint.data);
     }
     const steps = new Map();
     steps.set("extract_request_data", {
@@ -297,7 +310,9 @@ export async function saveEndpoints(endpoints: EndpointData[], serviceName: stri
     steps.set("get_prod_info", {
       call: "http.post",
       args: {
-        url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpointName}-prod-info`,
+        url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${
+          endpoint.data.isCommon ? "common/" : ""
+        }${endpointName}-prod-info`,
         body: {
           params: "${incoming.body.params ?? new Map()}",
           headers: "${incoming.body.headers ?? new Map()}",
@@ -310,7 +325,9 @@ export async function saveEndpoints(endpoints: EndpointData[], serviceName: stri
     steps.set("get_test_info", {
       call: `http.post`,
       args: {
-        url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${endpointName}-test-info`,
+        url: `${process.env.REACT_APP_API_URL}/services/endpoints/info/${
+          endpoint.data.isCommon ? "common/" : ""
+        }${endpointName}-test-info`,
         body: {
           params: "${incoming.body.params ?? new Map()}",
           headers: "${incoming.body.headers ?? new Map()}",
@@ -365,7 +382,9 @@ export async function saveEndpoints(endpoints: EndpointData[], serviceName: stri
         { result },
         {
           params: {
-            location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${endpointName}.yml`,
+            location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${
+              endpoint.data.isCommon ? "common/" : ""
+            }${endpointName}.yml`,
           },
         }
       )
