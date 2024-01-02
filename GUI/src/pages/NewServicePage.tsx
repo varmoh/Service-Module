@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate, useParams, useNavigation } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   Card,
@@ -77,7 +77,7 @@ const NewServicePage: React.FC = () => {
         availableVariables: availableVariables,
         flow: location.state?.flow,
         serviceDescription: description,
-        isCommon: isCommon,
+        isCommon,
       },
     });
   }, [endpoints, secrets, serviceName, availableVariables, location.state?.flow, description]);
@@ -188,7 +188,7 @@ const NewServicePage: React.FC = () => {
                   availableVariables: availableVariables,
                   flow: location.state?.flow,
                   serviceDescription: description,
-                  isCommon: isCommon,
+                  isCommon,
                 },
               });
             } else {
