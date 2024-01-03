@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   Card,
@@ -12,9 +12,7 @@ import {
   Track,
   Switch,
 } from "../components";
-import { v4 as uuid } from "uuid";
 import { ROUTES } from "../resources/routes-constants";
-import { Node } from "reactflow";
 import axios from "axios";
 import { getSecretVariables as getSecretVariablesApi, getTaraAuthResponseVariables, jsonToYml } from "../resources/api-constants";
 import {
@@ -34,73 +32,35 @@ import { saveEndpoints } from "services/service-builder";
 
 const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
-  const location = useLocation();
   const navigate = useNavigate();
   const userInfo = useStore((state) => state.userInfo);
-  const [endpoints, setEndpoints] = useState<EndpointData[]>(location.state?.endpoints ?? []);
-  const { intentName } = useParams();
-  const [serviceName, setServiceName] = useState<string>(location.state?.serviceName ?? intentName ?? "");
-  const [serviceId] = useState<string>(location.state?.serviceId ?? uuid());
-  const [description, setDescription] = useState<string>(location.state?.serviceDescription ?? "");
-  const [isCommon, setIsCommon] = useState<boolean>(location.state?.isCommon ?? false);
-  const [secrets, setSecrets] = useState<PreDefinedEndpointEnvVariables>(location.state?.secrets ?? {});
-  const onDelete = (id: string) => {
-    setEndpoints((prevEndpoints) => prevEndpoints.filter((prevEndpoint) => prevEndpoint.id !== id));
-  };
-  const [availableVariables, setAvailableVariables] = useState<PreDefinedEndpointEnvVariables>({ prod: [], test: [] });
+  const { 
+    serviceId,
+    endpoints,
+    flow,
+    isCommon,
+    setIsCommon,
+    description,
+    setDescription,
+    secrets,
+    availableVariables,
+    serviceName,
+    changeServiceName,
+    addEndpoint,
+    loadFlowData,
+  } = useServiceStore();
+
   const toast = useContext(ToastContext);
-  const { loadTaraVariables } = useServiceStore();
+
+  const { intentName } = useParams();
+  useEffect(() => {
+    const name = intentName?.trim();
+    if(name) changeServiceName(name);
+  }, [intentName])
 
   useEffect(() => {
-    const nodes: Node[] | undefined = location.state?.flow ? JSON.parse(location.state?.flow)?.nodes : undefined;
-    const variables: string[] = [];
-    nodes
-      ?.filter((node) => node.data.stepType === "input")
-      .forEach((node) => variables.push(`{{ClientInput_${node.data.clientInputId}}}`));
-    loadSecretVariables();
-    if (nodes?.find((node) => node.data.stepType === "auth")) loadTaraVariables();
-    setAvailableVariables((prevVariables) => {
-      variables.forEach((v) => {
-        if (!prevVariables.prod.includes(v)) prevVariables.prod.push(v);
-      });
-      return prevVariables;
-    });
+    loadFlowData();
   }, []);
-
-  useEffect(() => {
-    navigate(location.pathname, {
-      state: {
-        endpoints,
-        secrets,
-        serviceName,
-        serviceId,
-        availableVariables: availableVariables,
-        flow: location.state?.flow,
-        serviceDescription: description,
-        isCommon,
-      },
-    });
-  }, [endpoints, secrets, serviceName, availableVariables, location.state?.flow, description]);
-
-  const loadSecretVariables = () => {
-    axios.get(getSecretVariablesApi()).then((result) => {
-      const data: { prod: string[]; test: string[] } = result.data;
-      data.prod = data.prod.map((v) => `{{${v}}}`);
-      data.test = data.test.map((v) => `{{${v}}}`);
-      if (!data) return;
-      if (Object.keys(secrets).length === 0) setSecrets(data);
-
-      setAvailableVariables((prevVariables) => {
-        data.prod.forEach((v) => {
-          if (!prevVariables.prod.includes(v)) prevVariables.prod.push(v);
-        });
-        data.test.forEach((v) => {
-          if (!data.prod.includes(v) && !prevVariables.test.includes(v)) prevVariables.test.push(v);
-        });
-        return prevVariables;
-      });
-    });
-  };
 
   const saveDraft = async () => {
     if (serviceName && description) {
@@ -132,35 +92,6 @@ const NewServicePage: React.FC = () => {
     }
   };
 
-  const getSelectedEndpoints = () => {
-    return endpoints.map((endpoint) => {
-      return {
-        ...endpoint,
-        selectedEndpoint: endpoint.definedEndpoints.find((definedEndpoint) => definedEndpoint.isSelected),
-      };
-    });
-  };
-
-  const getAvailableRequestValues = (endpointId: string): PreDefinedEndpointEnvVariables => {
-    const otherEndpoints = getSelectedEndpoints().filter((otherEndpoint) => otherEndpoint.id !== endpointId);
-    otherEndpoints.forEach((endpoint) => {
-      endpoint.selectedEndpoint?.response?.forEach((response) => {
-        const variable = `{{${endpoint.name === "" ? endpoint.id : endpoint.name}.${response.name}}}`;
-        if (!availableVariables.prod.includes(variable)) availableVariables.prod.push(variable);
-      });
-    });
-    return availableVariables;
-  };
-
-  const onNameChange = (endpointId: string, oldName: string, newName: string) => {
-    availableVariables.prod = availableVariables.prod.filter((v) => v.replace("{{", "").split(".")[0] !== oldName);
-    const endpoint = getSelectedEndpoints().find((otherEndpoint) => otherEndpoint.id === endpointId);
-    endpoint?.selectedEndpoint?.response?.forEach((response) => {
-      const variable = `{{${newName === "" ? endpoint.id : newName}.${response.name}}}`;
-      if (!availableVariables.prod.includes(variable)) availableVariables.prod.push(variable);
-    });
-  };
-
   return (
     <Layout
       disableMenu
@@ -170,8 +101,7 @@ const NewServicePage: React.FC = () => {
           availableVariables={availableVariables}
           saveDraftOnClick={saveDraft}
           isSaveButtonEnabled={endpoints.length > 0}
-          endpoints={endpoints}
-          flow={location.state?.flow}
+          flow={flow}
           secrets={secrets}
           serviceDescription={description}
           serviceName={serviceName}
@@ -185,8 +115,8 @@ const NewServicePage: React.FC = () => {
                   secrets,
                   serviceName,
                   serviceId,
-                  availableVariables: availableVariables,
-                  flow: location.state?.flow,
+                  availableVariables,
+                  flow,
                   serviceDescription: description,
                   isCommon,
                 },
@@ -208,7 +138,7 @@ const NewServicePage: React.FC = () => {
           <Track direction="vertical" align="stretch" gap={16}>
             <div>
               <label htmlFor="name">{t("newService.name")}</label>
-              <FormInput name="name" label="" value={serviceName} onChange={(e) => setServiceName(e.target.value)} />
+              <FormInput name="name" label="" value={serviceName} onChange={(e) => changeServiceName(e.target.value)} />
             </div>
             <div>
               <label htmlFor="description">{t("newService.description")}</label>
@@ -241,22 +171,11 @@ const NewServicePage: React.FC = () => {
         </Card>
 
         {endpoints.map((endpoint) => (
-          <ApiEndpointCard
-            key={endpoint.id}
-            onDelete={() => onDelete(endpoint.id)}
-            endpoint={endpoint}
-            setEndpoints={setEndpoints}
-            requestValues={getAvailableRequestValues(endpoint.id)}
-            onNameChange={onNameChange}
-          />
+          <ApiEndpointCard key={endpoint.id} endpoint={endpoint} />
         ))}
         <Button
           appearance="text"
-          onClick={() =>
-            setEndpoints((endpoints) => {
-              return [...endpoints, { id: uuid(), name: "", definedEndpoints: [] }];
-            })
-          }
+          onClick={addEndpoint}
         >
           {t("newService.endpoint.add")}
         </Button>
