@@ -48,7 +48,8 @@
     "testService": "Testi teenust",
     "cancel": "Tühista",
     "close": "Sulge",
-    "common": "Levinud"
+    "common": "Levinud",
+    "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti."
   },
   "menu": {
     "overview": "Ülevaade",

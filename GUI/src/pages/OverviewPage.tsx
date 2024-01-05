@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Track } from "../components";
 import { getServicesList, trainingModuleTraining } from "../resources/api-constants";
@@ -7,6 +7,7 @@ import { Service, ServiceState } from "../types";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../resources/routes-constants";
 import axios from "axios";
+import { ToastContext } from "components/Toast/ToastContext";
 
 type ServicesResponse = {
   readonly id: number;
@@ -22,26 +23,37 @@ const OverviewPage: React.FC = () => {
 
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const toast = useContext(ToastContext);
 
   useEffect(() => {
     loadServicesList();
   }, []);
 
   const loadServicesList = async () => {
-    const result = await axios.get<{ response: ServicesResponse[] }>(getServicesList());
-    console.log(result.data.response);
-    const services = result.data.response.map((item) => {
-      return {
-        id: item.id,
-        name: item.name,
-        state: item.state,
-        type: item.type,
-        usedCount: 0,
-        isCommon: item.iscommon,
-      } as Service;
-    });
-    setServiceList(services.filter((e) => e.isCommon === false));
-    setCommonServiceList(services.filter((e) => e.isCommon === true));
+    axios
+      .get<{ response: ServicesResponse[] }>(getServicesList())
+      .then((res) => {
+        console.log(res.data.response);
+        const services = res.data.response.map((item) => {
+          return {
+            id: item.id,
+            name: item.name,
+            state: item.state,
+            type: item.type,
+            usedCount: 0,
+            isCommon: item.iscommon,
+          } as Service;
+        });
+        setServiceList(services.filter((e) => e.isCommon === false));
+        setCommonServiceList(services.filter((e) => e.isCommon === true));
+      })
+      .catch((_) => {
+        toast.open({
+          type: "error",
+          title: t("newService.toast.failed"),
+          message: t("global.errorMessage"),
+        });
+      });
   };
 
   return (

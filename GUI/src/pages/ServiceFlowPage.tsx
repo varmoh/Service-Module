@@ -107,13 +107,13 @@ const ServiceFlowPage: FC = () => {
   });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
-  const { endpoints, serviceId, isCommon, description, secrets, availableVariables, serviceNameDashed, setFlow } = useServiceStore();
+  const { endpoints, serviceId, isCommon, description, secrets, availableVariables, serviceNameDashed, setFlow } =
+    useServiceStore();
 
   const serviceName = useMemo(() => serviceNameDashed(), [useServiceStore.getState().serviceName]);
   const flow = useMemo(() => {
     const flowStr = useServiceStore.getState().flow;
-    if(!flowStr)
-      return undefined;
+    if (!flowStr) return undefined;
     return JSON.parse(flowStr);
   }, [useServiceStore.getState().flow]);
 
@@ -477,6 +477,11 @@ const ServiceFlowPage: FC = () => {
       })
       .catch((e) => {
         console.log(e);
+        toast.open({
+          type: "error",
+          title: t("newService.toast.failed"),
+          message: t("newService.toast.saveConfigFailed"),
+        });
       });
   };
 
@@ -526,6 +531,11 @@ const ServiceFlowPage: FC = () => {
       })
       .catch((e) => {
         console.log(e);
+        toast.open({
+          type: "error",
+          title: t("newService.toast.failed"),
+          message: t("newService.toast.saveInfoFailed"),
+        });
       });
   };
 
@@ -708,6 +718,11 @@ const ServiceFlowPage: FC = () => {
         })
         .catch((e) => {
           console.log(e);
+          toast.open({
+            type: "error",
+            title: t("newService.toast.failed"),
+            message: t("newService.toast.saveFailed"),
+          });
         });
     }
   };

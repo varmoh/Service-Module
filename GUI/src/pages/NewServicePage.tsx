@@ -33,7 +33,7 @@ const NewServicePage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const userInfo = useStore((state) => state.userInfo);
-  const { 
+  const {
     serviceId,
     endpoints,
     flow,
@@ -54,11 +54,11 @@ const NewServicePage: React.FC = () => {
   const { intentName } = useParams();
   useEffect(() => {
     const name = intentName?.trim();
-    if(name) changeServiceName(name);
-  }, [intentName])
+    if (name) changeServiceName(name);
+  }, [intentName]);
 
   useEffect(() => {
-    loadFlowData()
+    loadFlowData();
   }, []);
 
   const saveEndpoints = async () => {
@@ -250,6 +250,11 @@ const NewServicePage: React.FC = () => {
       })
       .catch((e) => {
         console.log(e);
+        toast.open({
+          type: "error",
+          title: t("newService.toast.failed"),
+          message: t("newService.toast.saveInfoFailed"),
+        });
       });
   };
 
@@ -388,6 +393,11 @@ const NewServicePage: React.FC = () => {
       })
       .catch((e) => {
         console.log(e);
+        toast.open({
+          type: "error",
+          title: t("newService.toast.failed"),
+          message: t("newService.toast.saveConfigFailed"),
+        });
       });
   };
 
@@ -569,10 +579,7 @@ const NewServicePage: React.FC = () => {
         {endpoints.map((endpoint) => (
           <ApiEndpointCard key={endpoint.id} endpoint={endpoint} />
         ))}
-        <Button
-          appearance="text"
-          onClick={addEndpoint}
-        >
+        <Button appearance="text" onClick={addEndpoint}>
           {t("newService.endpoint.add")}
         </Button>
       </Track>

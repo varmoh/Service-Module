@@ -48,7 +48,8 @@
     "testService": "Test service",
     "cancel": "Cancel",
     "close": "Close",
-    "common": "Common"
+    "common": "Common",
+    "errorMessage": "There is no access to the service. Try again later."
   },
   "menu": {
     "overview": "Overview",

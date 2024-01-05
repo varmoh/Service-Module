@@ -14,34 +14,10 @@ instance.interceptors.response.use(
         return response;
     },
     (error: AxiosError) => {
-        switch (error.response?.status) {
-            case 400:
-                console.log('Bad request');
-                break;
-            case 401:   
-                console.log('Unauthorized');
-                break;
-            case 403:   
-                console.log('Forbidden');
-                break;
-            case 404:   
-                console.log('Not found');
-                break;
-            case 408:   
-                console.log('Request timeout');
-                break;    
-            case 500:   
-                console.log('Server error');
-                break;
-            case 502:   
-                console.log('Bad gateway');
-                break;
-            case 504:   
-                console.log('Gateway timeout');
-                break;                          
-            default:
-                console.log('Error');    
-       }
+        // Add switch case to handle specific error codes
+        if ((error.response?.status ?? 0) > 400 && (error.response?.status ?? 0) < 599) {
+            console.log('Teenusele puudub ligipääs. Proovi hiljem uuesti.');
+        }
         return Promise.reject(error);
     },
 );
