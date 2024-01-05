@@ -151,7 +151,13 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               name="endpointUrl"
               label=""
               defaultValue={endpoint.definedEndpoints[0].url ?? ""}
-              onChange={(event) => (endpoint.definedEndpoints[0].url = event.target.value)}
+              onChange={(event) => {
+                const parsedUrl = parseURL(event.target.value);
+                console.log(parsedUrl.params);
+                endpoint.definedEndpoints[0].url = parsedUrl.url;
+                
+                // endpoint.definedEndpoints[0].params = parsedUrl.params;
+              }}
               placeholder={t("newService.endpoint.insert") ?? ""}
             />
           </Track>
@@ -206,5 +212,26 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
     </Track>
   );
 };
+
+function parseURL(url: string) {
+  try {
+    const parsedURL = new URL(url);
+    const params: { [key: string]: any } = {};
+
+    parsedURL.searchParams.forEach((value, key) => {
+      params[key] = value;
+    });
+
+    return {
+      url: parsedURL.href,
+      params: params,
+    };
+  } catch (e) {
+    return {
+      url: url,
+      params: "",
+    };
+  }
+}
 
 export default EndpointCustom;
