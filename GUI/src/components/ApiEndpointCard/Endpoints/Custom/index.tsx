@@ -102,7 +102,7 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         return prevEndpoint;
       });
     });
-    setKey(key + 1);
+    setKey((prevKey) => prevKey + 1);
   };
 
   const updateEndpointRawData = (data: RequestVariablesTabsRawData, endpointId?: string) => {
@@ -122,7 +122,12 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
         return prevEndpoint;
       });
     });
-    setKey(key + 1);
+    setKey((prevKey) => prevKey + 1);
+  };
+
+  const refereshEndpoint = () => {
+    setEndpoints((endpoint) => endpoint);
+    setKey((prevKey) => prevKey + 1);
   };
 
   return (
@@ -153,10 +158,23 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
               defaultValue={endpoint.definedEndpoints[0].url ?? ""}
               onChange={(event) => {
                 const parsedUrl = parseURL(event.target.value);
-                console.log(parsedUrl.params);
                 endpoint.definedEndpoints[0].url = parsedUrl.url;
-                
-                // endpoint.definedEndpoints[0].params = parsedUrl.params;
+                const parameters: EndpointVariableData[] = [];
+                Object.keys(parsedUrl.params).forEach((key) => {
+                  parameters.push({
+                    id: uuid(),
+                    name: key,
+                    type: "custom",
+                    required: false,
+                    value: parsedUrl.params[key],
+                  });
+                });
+
+                endpoint.definedEndpoints[0].params = {
+                  variables: parameters,
+                  rawData: {},
+                };
+                refereshEndpoint();
               }}
               placeholder={t("newService.endpoint.insert") ?? ""}
             />
@@ -216,20 +234,16 @@ const EndpointCustom: React.FC<EndpointCustomProps> = ({
 function parseURL(url: string) {
   try {
     const parsedURL = new URL(url);
-    const params: { [key: string]: any } = {};
-
-    parsedURL.searchParams.forEach((value, key) => {
-      params[key] = value;
-    });
+    const params: { [key: string]: any } = Object.fromEntries(parsedURL.searchParams);
 
     return {
       url: parsedURL.href,
-      params: params,
+      params,
     };
   } catch (e) {
     return {
-      url: url,
-      params: "",
+      url,
+      params: {},
     };
   }
 }
