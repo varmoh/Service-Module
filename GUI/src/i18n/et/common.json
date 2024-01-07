@@ -188,7 +188,9 @@
       "savedSuccessfully": "Salvestatud edukalt",
       "success": "Edu",
       "failed": "Ebaõnnestunud",
-      "saveFailed": "Salvestamine ebaõnnestus"
+      "saveFailed": "Salvestamine ebaõnnestus",
+      "saveInfoFailed": "Teabe salvestamine ebaõnnestus",
+      "saveConfigFailed": "Konfiguratsiooni salvestamine ebaõnnestus"
     }
   },
   "serviceFlow": {
