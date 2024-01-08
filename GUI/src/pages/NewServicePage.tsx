@@ -14,7 +14,11 @@ import {
 } from "../components";
 import { ROUTES } from "../resources/routes-constants";
 import axios from "axios";
-import { getSecretVariables as getSecretVariablesApi, getTaraAuthResponseVariables, jsonToYml } from "../resources/api-constants";
+import {
+  getSecretVariables as getSecretVariablesApi,
+  getTaraAuthResponseVariables,
+  jsonToYml,
+} from "../resources/api-constants";
 import {
   EndpointData,
   EndpointEnv,
@@ -66,23 +70,24 @@ const NewServicePage: React.FC = () => {
     if (serviceName && description) {
       await saveEndpoints(
         endpoints,
-        serviceName, 
+        serviceName,
         (r) => {
-        console.log(r);
-        toast.open({
-          type: "success",
-          title: t("newService.toast.success"),
-          message: t("newService.toast.savedSuccessfully"),
-        });
-      },
-      (e) => {
-        console.log(e);
-        toast.open({
-          type: "error",
-          title: t("newService.toast.failed"),
-          message: t("newService.toast.saveFailed"),
-        });
-      });
+          console.log(r);
+          toast.open({
+            type: "success",
+            title: t("newService.toast.success"),
+            message: t("newService.toast.savedSuccessfully"),
+          });
+        },
+        (e) => {
+          console.log(e);
+          toast.open({
+            type: "error",
+            title: t("newService.toast.failed"),
+            message: t("newService.toast.saveFailed"),
+          });
+        }
+      );
     }
   };
 
@@ -257,18 +262,6 @@ const NewServicePage: React.FC = () => {
     }
   };
 
-  const saveDraft = async () => {
-    if (serviceName && description) {
-      await saveEndpoints();
-    } else {
-      toast.open({
-        type: "error",
-        title: t("newService.toast.missingFields"),
-        message: t("newService.toast.serviceMissingFields"),
-      });
-    }
-  };
-
   return (
     <Layout
       disableMenu
@@ -340,7 +333,7 @@ const NewServicePage: React.FC = () => {
                   offLabel={t("global.no").toString()}
                   value={isCommon}
                   checked={isCommon}
-                  onCheckedChange={(e) => setIsCommon(e)}
+                  onCheckedChange={(e: boolean) => setIsCommon(e)}
                 />
               </Track>
             )}
