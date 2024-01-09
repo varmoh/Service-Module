@@ -13,8 +13,6 @@ const App: React.FC = () => {
     }>({
       queryKey: ["userinfo", "prod"],
       onSuccess: (res: any) => {
-        console.log('USERINFO')
-        console.log(res)
         return useStore.getState().setUserInfo(res.data)
       },
     });

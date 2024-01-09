@@ -73,7 +73,7 @@ services:
 
   data_mapper:
     container_name: data_mapper
-    image: data-mapper
+    image: training-module_node
     environment:
       - PORT=3005
       - CONTENT_FOLDER=/data
@@ -124,7 +124,7 @@ services:
       - REACT_APP_MENU_PATH=/chat/menu.json
       - REACT_APP_API_PATH=/
       - REACT_APP_LOCAL=true
-      - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8086
+      - REACT_APP_RUUTER_API_URL=http://localhost:8086
     build:
       context: ./GUI
       dockerfile: Dockerfile.dev
