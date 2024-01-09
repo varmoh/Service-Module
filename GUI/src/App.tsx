@@ -8,9 +8,15 @@ import { UserInfo } from "./types/userInfo";
 
 const App: React.FC = () => {
   if (import.meta.env.REACT_APP_LOCAL === "true") {
-    const { data } = useQuery<UserInfo>({
-      queryKey: ["custom-jwt-userinfo", "prod"],
-      onSuccess: (res: any) => useStore.getState().setUserInfo(res.response),
+    useQuery<{
+      data: { custom_jwt_userinfo: UserInfo };
+    }>({
+      queryKey: ["userinfo", "prod"],
+      onSuccess: (res: any) => {
+        console.log('USERINFO')
+        console.log(res)
+        return useStore.getState().setUserInfo(res.data)
+      },
     });
   } else {
     const { data: userInfo } = useQuery<UserInfo>({
