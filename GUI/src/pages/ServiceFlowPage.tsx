@@ -61,6 +61,7 @@ type NodeDataProps = {
   linkText?: string;
   fileName?: string;
   fileContent?: string;
+  signType?: { label: string; value: string };
 };
 
 const initialNodes: Node[] = [
@@ -107,13 +108,13 @@ const ServiceFlowPage: FC = () => {
   });
   const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
-  const { endpoints, serviceId, isCommon, description, secrets, availableVariables, serviceNameDashed, setFlow } = useServiceStore();
+  const { endpoints, serviceId, isCommon, description, secrets, availableVariables, serviceNameDashed, setFlow } =
+    useServiceStore();
 
   const serviceName = useMemo(() => serviceNameDashed(), [useServiceStore.getState().serviceName]);
   const flow = useMemo(() => {
     const flowStr = useServiceStore.getState().flow;
-    if(!flowStr)
-      return undefined;
+    if (!flowStr) return undefined;
     return JSON.parse(flowStr);
   }, [useServiceStore.getState().flow]);
 
@@ -918,7 +919,8 @@ const ServiceFlowPage: FC = () => {
           prevNode.data.link != updatedNode.data.link ||
           prevNode.data.linkText != updatedNode.data.linkText ||
           prevNode.data.fileName != updatedNode.data.fileName ||
-          prevNode.data.fileContent != updatedNode.data.fileContent
+          prevNode.data.fileContent != updatedNode.data.fileContent ||
+          prevNode.data.signOption != updatedNode.data.signOption
         ) {
           setIsTestButtonEnabled(false);
         }
@@ -931,6 +933,7 @@ const ServiceFlowPage: FC = () => {
             linkText: updatedNode.data.linkText,
             fileName: updatedNode.data.fileName,
             fileContent: updatedNode.data.fileContent,
+            signOption: updatedNode.data.signOption,
           },
         };
       })

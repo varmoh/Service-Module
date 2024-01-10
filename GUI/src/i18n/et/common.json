@@ -228,7 +228,8 @@
       "fileSign": "Kas soovid faili allkirjastada?",
       "fileSignYesNo": "Kas soovid faili allkirjastada? Jah/Ei",
       "serviceEnded": "Teenus on lõpetatud",
-      "rule": "Reegel"
+      "rule": "Reegel",
+      "signType": "Märgi tüüp"
     },
     "flow": "Teenusvoog",
     "placeholderNode": "Lohista järgmine samm voogu",
