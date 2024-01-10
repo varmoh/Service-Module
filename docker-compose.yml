@@ -125,6 +125,7 @@ services:
       - REACT_APP_API_PATH=/
       - REACT_APP_LOCAL=true
       - REACT_APP_RUUTER_API_URL=http://localhost:8086
+      - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8086
     build:
       context: ./GUI
       dockerfile: Dockerfile.dev
