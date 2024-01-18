@@ -1,7 +1,10 @@
 getFaults:
   call: http.get
   args:
-    url: "[#SERVICE_OPENSEARCH]/faults/_search?size=10000"
+    url: "[#SERVICE_OPENSEARCH]/ruuterlog/_search"
+    query:
+      size: 20
+      _source_excludes: "stackTrace,statusCode"
   result: getFaultsResult
 
 mapFaultsData:
@@ -11,7 +14,9 @@ mapFaultsData:
     headers:
       type: 'json'
     body:
-      hits: ${getFaultsResult.response.body.hits.hits}  
+      data: {
+        "hits": "${getFaultsResult.response.body.hits.hits}"
+      }
   result: faultsData
 
 returnSuccess:

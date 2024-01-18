@@ -246,7 +246,16 @@
     "problems": "Problems",
     "view": "View",
     "log": "Log",
-    "environment": "Environment"
+    "environment": "Environment",
+    "method": "Method",
+    "errorCode": "Error Code",
+    "failedStep": "Failed Step",
+    "failedTime": "Date and Time",
+    "noErrorMessage": "No error message",
+    "errorMessage": "Error Message",
+    "headers": "Headers",
+    "parameters": "Parameters",
+    "body": "Body"
   },
   "toast": {
     "cannot-save-flow": "Cannot Save Flow",
