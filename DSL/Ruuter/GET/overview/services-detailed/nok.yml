@@ -5,6 +5,11 @@ getFaults:
     query:
       size: 20
       _source_excludes: "stackTrace,statusCode"
+    body:
+      query:
+        match_phrase_prefix:
+          dslName:
+            query: "services/active"  
   result: getFaultsResult
 
 mapFaultsData:
