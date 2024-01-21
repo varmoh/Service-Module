@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Card, DataTable, Icon, Track } from "../components";
-import { PaginationState, createColumnHelper } from "@tanstack/react-table";
+import { PaginationState, Row, createColumnHelper } from "@tanstack/react-table";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import Popup from "../components/Popup";
 import axios from "axios";
@@ -50,6 +50,11 @@ const FaultyServicesPage: React.FC = () => {
       columnHelper.accessor("timestamp", {
         header: t("logs.failedTime") ?? "",
         cell: (props) => <span>{format(new Date(parseInt(props.getValue() ?? "0")), "dd-MM-yyyy HH:mm:ss")}</span>,
+        filterFn: (row: Row<FaultyService>, _, filterValue) => {
+          return format(new Date(parseInt(row.original.timestamp ?? "0")), "dd-MM-yyyy HH:mm:ss")
+            .toLowerCase()
+            .includes(filterValue.toLowerCase());
+        },
       }),
       columnHelper.display({
         id: "view",
