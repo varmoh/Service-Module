@@ -1,5 +1,5 @@
 getFaults:
-  call: http.get
+  call: http.post
   args:
     url: "[#SERVICE_OPENSEARCH]/ruuterlog/_search"
     query:
