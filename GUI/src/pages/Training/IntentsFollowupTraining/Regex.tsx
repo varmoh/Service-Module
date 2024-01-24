@@ -46,9 +46,9 @@ const Regex: FC = () => {
     },
     onError: (error: AxiosError) => {
       toast.open({
-        type: 'error',
-        title: t('intents.notificationError'),
-        message: error.message,
+        type: "error",
+        title: t("newService.toast.failed"),
+        message: t("global.errorMessage"),
       });
     },
     onSettled: () => setAddFormVisible(false),
@@ -70,9 +70,9 @@ const Regex: FC = () => {
     },
     onError: (error: AxiosError) => {
       toast.open({
-        type: 'error',
-        title: t('intents.notificationError'),
-        message: error.message,
+        type: "error",
+        title: t("newService.toast.failed"),
+        message: t("global.errorMessage"),
       });
     },
     onSettled: () => setDeletableRow(null),

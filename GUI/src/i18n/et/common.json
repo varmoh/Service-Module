@@ -48,7 +48,8 @@
     "testService": "Testi teenust",
     "cancel": "Tühista",
     "close": "Sulge",
-    "common": "Levinud"
+    "common": "Levinud",
+    "errorMessage": "Teenusele puudub ligipääs. Proovi hiljem uuesti."
   },
   "menu": {
     "overview": "Ülevaade",
@@ -187,7 +188,9 @@
       "savedSuccessfully": "Salvestatud edukalt",
       "success": "Edu",
       "failed": "Ebaõnnestunud",
-      "saveFailed": "Salvestamine ebaõnnestus"
+      "saveFailed": "Salvestamine ebaõnnestus",
+      "saveInfoFailed": "Teabe salvestamine ebaõnnestus",
+      "saveConfigFailed": "Konfiguratsiooni salvestamine ebaõnnestus"
     }
   },
   "serviceFlow": {
