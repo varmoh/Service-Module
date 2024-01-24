@@ -933,7 +933,8 @@ const ServiceFlowPage: FC = () => {
           prevNode.data.link != updatedNode.data.link ||
           prevNode.data.linkText != updatedNode.data.linkText ||
           prevNode.data.fileName != updatedNode.data.fileName ||
-          prevNode.data.fileContent != updatedNode.data.fileContent
+          prevNode.data.fileContent != updatedNode.data.fileContent ||
+          prevNode.data.signOption != updatedNode.data.signOption
         ) {
           setIsTestButtonEnabled(false);
         }
@@ -946,6 +947,7 @@ const ServiceFlowPage: FC = () => {
             linkText: updatedNode.data.linkText,
             fileName: updatedNode.data.fileName,
             fileContent: updatedNode.data.fileContent,
+            signOption: updatedNode.data.signOption,
           },
         };
       })

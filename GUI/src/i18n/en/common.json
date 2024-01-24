@@ -231,7 +231,8 @@
       "fileSign": "Do you want to sign this file?",
       "fileSignYesNo": "Do you want to sign this file? Yes/No",
       "serviceEnded": "Service ended",
-      "rule": "Rule"
+      "rule": "Rule",
+      "signType": "Sign Type"
     },
     "flow": "Service flow",
     "placeholderNode": "Drag the next step into the flow",
