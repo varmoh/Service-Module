@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { createColumnHelper } from "@tanstack/react-table";
-import { AxiosError } from "axios";
 import {
   MdAddCircle,
   MdDeleteOutline,
@@ -15,9 +14,9 @@ import {
 
 import { Button, Card, DataTable, Dialog, FormInput, FormSelect, FormTextarea, Icon, Track } from "../../../components";
 import useDocumentEscapeListener from "../../../hooks/useDocumentEscapeListener";
-import { useToast } from "../../../hooks/useToast";
 import { addRegexExample, deleteRegex, deleteRegexExample, editRegex, editRegexExample } from "../../../services/regex";
 import { Entity } from "../../../types/entity";
+import useToastStore from 'store/toasts.store';
 
 type Regex = {
   readonly id: number;
@@ -29,7 +28,6 @@ type Regex = {
 const RegexDetail: FC = () => {
   const { t } = useTranslation();
   const { id } = useParams();
-  const toast = useToast();
   const navigate = useNavigate();
   const newExampleRef = useRef<HTMLTextAreaElement>(null);
   const [exampleText, setExampleText] = useState<string>("");
@@ -59,16 +57,14 @@ const RegexDetail: FC = () => {
   const regexEditMutation = useMutation({
     mutationFn: ({ id, data }: { id: string | number; data: { name: string } }) => editRegex(id, data),
     onSuccess: () => {
-      toast.open({
-        type: "success",
-        title: t("global.notification"),
-        message: "New regex example added",
+      useToastStore.getState().success({
+        title: t('global.notification'),
+        message: 'New regex example added',
       });
     },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: "error",
-        title: t("newService.toast.failed"),
+    onError: () => {
+      useToastStore.getState().error({
+        title: t('newService.toast.failed'),
         message: t("global.errorMessage"),
       });
     },
@@ -78,15 +74,13 @@ const RegexDetail: FC = () => {
   const regexDeleteMutation = useMutation({
     mutationFn: ({ id }: { id: string | number }) => deleteRegex(id),
     onSuccess: () => {
-      toast.open({
-        type: "success",
+      useToastStore.getState().success({
         title: t("global.notification"),
         message: "Regex deleted",
       });
     },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: "error",
+    onError: () => {
+      useToastStore.getState().error({
         title: t("newService.toast.failed"),
         message: t("global.errorMessage"),
       });
@@ -97,15 +91,13 @@ const RegexDetail: FC = () => {
   const regexExampleAddMutation = useMutation({
     mutationFn: (data: { example: string }) => addRegexExample(data),
     onSuccess: () => {
-      toast.open({
-        type: "success",
+      useToastStore.getState().success({
         title: t("global.notification"),
         message: "Example added",
       });
     },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: "error",
+    onError: () => {
+      useToastStore.getState().error({
         title: t("newService.toast.failed"),
         message: t("global.errorMessage"),
       });
@@ -116,15 +108,13 @@ const RegexDetail: FC = () => {
   const regexExampleDeleteMutation = useMutation({
     mutationFn: ({ id }: { id: string | number }) => deleteRegexExample(id),
     onSuccess: () => {
-      toast.open({
-        type: "success",
+      useToastStore.getState().success({
         title: t("global.notification"),
         message: "Example deleted",
       });
     },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: "error",
+    onError: () => {
+      useToastStore.getState().error({
         title: t("newService.toast.failed"),
         message: t("global.errorMessage"),
       });
@@ -135,15 +125,13 @@ const RegexDetail: FC = () => {
   const regexExampleEditMutation = useMutation({
     mutationFn: ({ id, data }: { id: string | number; data: { example: string } }) => editRegexExample(id, data),
     onSuccess: () => {
-      toast.open({
-        type: "success",
+      useToastStore.getState().success({
         title: t("global.notification"),
         message: "Example changed",
       });
     },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: "error",
+    onError: () => {
+      useToastStore.getState().error({
         title: t("newService.toast.failed"),
         message: t("global.errorMessage"),
       });

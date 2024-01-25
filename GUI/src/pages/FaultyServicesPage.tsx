@@ -23,10 +23,6 @@ interface FaultyService {
 
 const FaultyServicesPage: React.FC = () => {
   const { t } = useTranslation();
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
   const [viewFaultyServiceLog, setViewFaultyServiceLog] = useState<FaultyService | null>(null);
   const [data, setData] = useState<FaultyService[]>([]);
 
@@ -165,8 +161,6 @@ const FaultyServicesPage: React.FC = () => {
           <DataTable
             sortable
             filterable
-            pagination={pagination}
-            setPagination={setPagination}
             data={data}
             columns={columns}
           />
