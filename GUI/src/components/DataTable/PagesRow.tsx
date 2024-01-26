@@ -7,11 +7,15 @@ import clsx from 'clsx'
 interface PagesRowProps {
   table: Table<any>;
   setPageIndex: React.Dispatch<React.SetStateAction<number>>;
+  pagesShown?: number;
 }
 
-const PagesRow: React.FC<PagesRowProps> = ({ table, setPageIndex }) => {
+const PagesRow: React.FC<PagesRowProps> = ({ 
+  table,
+  setPageIndex,
+  pagesShown = 7,
+}) => {
   const { t } = useTranslation();
-  const pagesShown = 7;
 
   const getPages = useCallback(() => {
     const current = table.getState().pagination.pageIndex;

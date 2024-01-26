@@ -17,9 +17,9 @@ import {
 } from '@tanstack/react-table';
 import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import TableHeader from './TableHeader';
-import TableFooter, { pageSizeOptions } from './TableFooter';
-import './DataTable.scss';
+import TableFooter from './TableFooter';
 import { useSearchParams } from 'react-router-dom';
+import './DataTable.scss';
 
 type DataTableProps = {
   data: any
@@ -75,7 +75,7 @@ const DataTable: FC<DataTableProps> = ({
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const [pageSize, setPageSize] = useState(10);
   const [params] = useSearchParams();
   const page = params.get('page');
   

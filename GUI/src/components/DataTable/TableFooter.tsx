@@ -8,11 +8,15 @@ interface TableFooterProps {
   table: Table<any>;
   setPageIndex: React.Dispatch<React.SetStateAction<number>>;
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
+  pageSizeOptions?: number[];
 }
 
-export const pageSizeOptions = [10, 20, 30, 40, 50];
-
-const TableFooter: React.FC<TableFooterProps> = ({ table, setPageIndex, setPageSize, }) => {
+const TableFooter: React.FC<TableFooterProps> = ({
+  table,
+  setPageIndex,
+  setPageSize,
+  pageSizeOptions = [10, 20, 30, 40, 50],
+}) => {
   const { t } = useTranslation();
   const nextPage = () => setPageIndex(prev => prev + 1);
   const previousPage = () => setPageIndex(prev => prev - 1);
