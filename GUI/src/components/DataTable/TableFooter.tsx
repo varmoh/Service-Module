@@ -18,8 +18,18 @@ const TableFooter: React.FC<TableFooterProps> = ({
   pageSizeOptions = [10, 20, 30, 40, 50],
 }) => {
   const { t } = useTranslation();
+  
   const nextPage = () => setPageIndex(prev => prev + 1);
   const previousPage = () => setPageIndex(prev => prev - 1);
+
+  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(Number(e.target.value));
+    setTimeout(() => {
+      if(table.getState().pagination.pageIndex >= table.getPageCount()){
+        setPageIndex(table.getPageCount() - 1);
+      }
+    }, 0);
+  }
 
   return (
     <div className="data-table__pagination-wrapper">
@@ -46,7 +56,7 @@ const TableFooter: React.FC<TableFooterProps> = ({
         <label>{t('global.resultCount')}</label>
         <select
           value={table.getState().pagination.pageSize}
-          onChange={(e) => setPageSize(Number(e.target.value))}
+          onChange={handlePageSizeChange}
         >
           {pageSizeOptions.map(pageSize => (
             <option key={pageSize} value={pageSize}>
