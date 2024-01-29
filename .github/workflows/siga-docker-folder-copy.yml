@@ -1,12 +1,12 @@
 name: Copy Folder
 
 on:
-  workflow_dispatch:
-     inputs:
-      branch:
-        description: 'Branch to trigger the workflow on'
-        required: true
-        default: 'dev'
+  push:
+    branches:
+      - dev
+    paths:
+      - 'README.md'
+
 
 
 jobs:
