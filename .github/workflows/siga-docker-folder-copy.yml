@@ -19,7 +19,7 @@ jobs:
 
     - name: Set Up Folder Structure and Copy
       run: |
-        FOLDER_PATH=docker
+        FOLDER_PATH=docker-siga
         SOURCE_REPO=buerokratt/open-eid-SiGa
         SOURCE_FOLDER=docker
 
@@ -38,6 +38,6 @@ jobs:
       run: |
         git config --global user.email "actions@github.com"
         git config --global user.name "GitHub Actions"
-        git add docker
+        git add docker-siga
         git diff-index --quiet HEAD || git commit -m "Copy contents and update folder structure using GitHub Actions"
         git push
