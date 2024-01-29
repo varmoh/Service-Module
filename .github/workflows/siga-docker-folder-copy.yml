@@ -36,9 +36,8 @@ jobs:
 
     - name: Commit and Push Changes
       run: |
-        cd "$FOLDER_PATH"
         git config --global user.email "actions@github.com"
         git config --global user.name "GitHub Actions"
-        git add .
-        git commit -m "Copy folder from another repo"
+        git add docker
+        git diff-index --quiet HEAD || git commit -m "Copy contents and update folder structure using GitHub Actions"
         git push
