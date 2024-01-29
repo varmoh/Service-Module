@@ -61,6 +61,7 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
 
   const reactFlowInstance = useServiceStore(state => state.reactFlowInstance);
   const setReactFlowInstance = useServiceStore(state => state.setReactFlowInstance);
+  const onDelete = useServiceStore(state => state.onDelete);
   const handleNodeEdit = useServiceStore.getState().handleNodeEdit;
 
   useEffect(() => {

@@ -60,6 +60,7 @@ interface ServiceState {
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
   handleNodeEdit: (selectedNodeId: string) => void;
+  onDelete: (id: string, shouldAddPlaceholder: boolean) => void;
   clickedNode: any;
   setClickedNode: (clickedNode: any) => void;
 
@@ -193,7 +194,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
         if (node.type !== "customNode") return node;
         node.data = {
           ...node.data,
-          onDelete: () => {},
+          onDelete: get().onDelete,
           setClickedNode: get().setClickedNode,
           onEdit: get().handleNodeEdit,
           // update: updateInputRules, //////////////// to do later
@@ -423,7 +424,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
     get().setSelectedNode(node);
    },
 
-  onDelete: (id: string, shouldAddPlaceholder: boolean) => {
+  onDelete: (id, shouldAddPlaceholder) => {
     const reactFlowInstance = get().reactFlowInstance;
       if (!reactFlowInstance) return;
       const deletedNode = reactFlowInstance.getNodes().find((node) => node.id === id);
