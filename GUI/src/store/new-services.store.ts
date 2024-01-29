@@ -10,7 +10,7 @@ import useToastStore from './toasts.store';
 import i18next from 'i18next';
 import { ROUTES } from 'resources/routes-constants';
 import { NavigateFunction } from 'react-router-dom';
-import { editServiceInfo, saveDraft, saveFlowClick } from 'services/service-builder';
+import { editServiceInfo, saveFlowClick } from 'services/service-builder';
 import { initialEdge, initialNodes } from 'types/service-flow';
 
 interface ServiceState {
@@ -156,9 +156,11 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       secrets: { prod: [], test: [] },
       availableVariables: { prod: [], test: [] },
       isCommon: false,
-      reactFlowInstance: undefined,
+      reactFlowInstance: null,
       selectedTab: EndpointEnv.Live,
       isNewService: true,
+      edges: [],
+      nodes: [],
     })
   },
   loadService: async (id) => {
