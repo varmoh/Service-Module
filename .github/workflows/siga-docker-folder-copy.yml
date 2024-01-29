@@ -20,14 +20,6 @@ jobs:
     - name: Set Up Folder Structure and Copy
       run: |
         FOLDER_PATH=docker
-        if [ ! -d "$FOLDER_PATH" ]; then
-          echo "Folder structure does not exist, creating..."
-          mkdir -p "$FOLDER_PATH"
-          touch "$FOLDER_PATH/README.yml"
-        else
-          echo "Folder structure already exists."
-        fi
-
         SOURCE_REPO=buerokratt/open-eid-SiGa
         SOURCE_FOLDER=docker
 
