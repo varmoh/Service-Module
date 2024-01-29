@@ -1,11 +1,8 @@
 name: Copy Folder
 
 on:
-  push:
-    branches:
-      - dev
-    paths:
-      - '.README.md' 
+  workflow_dispatch:
+
 
 jobs:
   copy-folder:
