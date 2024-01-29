@@ -11,7 +11,8 @@ import i18next from 'i18next';
 import { ROUTES } from 'resources/routes-constants';
 import { NavigateFunction } from 'react-router-dom';
 import { editServiceInfo, saveFlowClick } from 'services/service-builder';
-import { initialEdge, initialNodes } from 'types/service-flow';
+import { GRID_UNIT, NodeDataProps, initialEdge, initialNodes } from 'types/service-flow';
+import { buildEdge, buildPlaceholder } from 'services/flow-builder';
 
 interface ServiceState {
   flow: string | undefined;
@@ -56,6 +57,11 @@ interface ServiceState {
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?:string) => void;
   resetState: () => void;
   onContinueClick: (navigate: NavigateFunction) => Promise<void>;
+  selectedNode: Node<NodeDataProps> | null;
+  setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
+  handleNodeEdit: (selectedNodeId: string) => void;
+  clickedNode: any;
+  setClickedNode: (clickedNode: any) => void;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
@@ -182,6 +188,18 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
 
       if(!endpoints || !(endpoints instanceof Array))
         endpoints = [];
+
+        nodes = nodes.map((node: any) => {
+        if (node.type !== "customNode") return node;
+        node.data = {
+          ...node.data,
+          onDelete: () => {},
+          setClickedNode: get().setClickedNode,
+          onEdit: get().handleNodeEdit,
+          // update: updateInputRules, //////////////// to do later
+        };
+        return node;
+      });
 
       set({ 
         serviceId: id,
@@ -396,6 +414,126 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
 
     navigate(ROUTES.replaceWithId(ROUTES.FLOW_ROUTE, get().serviceId));
   },
+  selectedNode: null,
+  setSelectedNode: (node) => set({ selectedNode: node }),
+  handleNodeEdit: (selectedNodeId: string) => {
+    const reactFlowInstance = get().reactFlowInstance;
+    if (!reactFlowInstance) return;
+    const node = reactFlowInstance.getNode(selectedNodeId);
+    get().setSelectedNode(node);
+   },
+
+  onDelete: (id: string, shouldAddPlaceholder: boolean) => {
+    const reactFlowInstance = get().reactFlowInstance;
+      if (!reactFlowInstance) return;
+      const deletedNode = reactFlowInstance.getNodes().find((node) => node.id === id);
+      const edgeToDeletedNode = reactFlowInstance.getEdges().find((edge) => edge.target === id);
+      if (!deletedNode) return;
+      let updatedNodes: Node[] = [];
+      let currentEdges: Edge[] = [];
+      get().setEdges((prevEdges) => (currentEdges = prevEdges));
+      get().setNodes((prevNodes) => {
+        let newNodes: Node[] = [];
+
+        if (deletedNode.data.stepType !== StepType.Input) {
+          // delete only targeted node
+          newNodes.push(...prevNodes.filter((node) => node.id !== id));
+        } else {
+          // delete input node with it's rules
+          const deletedRules = currentEdges.filter((edge) => edge.source === id).map((edge) => edge.target);
+
+          newNodes.push(...prevNodes.filter((node) => node.id !== id && !deletedRules.includes(node.id)));
+        }
+
+        // cleanup leftover placeholders
+        newNodes = newNodes.filter((node) => {
+          if (node.type !== "placeholder") return true;
+
+          const pointingEdge = currentEdges.find((edge) => edge.target === node.id);
+          const pointingEdgeSource = newNodes.find((newNode) => newNode.id === pointingEdge?.source);
+          if (!pointingEdgeSource) return false;
+          return true;
+        });
+
+        updatedNodes = newNodes;
+        return newNodes;
+      });
+
+      get().setEdges((prevEdges) => {
+        const toRemove = prevEdges.filter((edge) => {
+          if (deletedNode.data.stepType !== StepType.Input) {
+            // remove edges pointing to/from removed node
+            return edge.target === id || edge.source === id;
+          } else {
+            // remove edges not pointing to present nodes
+            return !updatedNodes.map((node) => node.id).includes(edge.target);
+          }
+        });
+
+        if (toRemove.length === 0) return prevEdges;
+        let newEdges = [...prevEdges.filter((edge) => !toRemove.includes(edge))];
+        if (
+          deletedNode.data.stepType !== StepType.Input &&
+          newEdges.length > 0 &&
+          toRemove.length > 1 &&
+          shouldAddPlaceholder
+        ) {
+          // if only 1 node was removed, point edge to whatever it was pointing to
+          newEdges.push(
+            buildEdge({
+              id: `edge-${toRemove[0].source}-${toRemove[toRemove.length - 1].target}`,
+              source: toRemove[0].source,
+              sourceHandle: toRemove[0].sourceHandle,
+              target: toRemove[toRemove.length - 1].target,
+            })
+          );
+        }
+
+        // cleanup possible leftover edges
+        newEdges = newEdges.filter(
+          (edge) =>
+            updatedNodes.find((node) => node.id === edge.source) && updatedNodes.find((node) => node.id === edge.target)
+        );
+
+        return newEdges;
+      });
+
+      if (!edgeToDeletedNode || !shouldAddPlaceholder) return;
+      get().setEdges((prevEdges) => {
+        // check if previous node points to anything
+        if (prevEdges.find((edge) => edge.source === edgeToDeletedNode.source)) {
+          return prevEdges;
+        }
+
+        // Previous node points to nothing -> add placeholder with edge
+        get().setNodes((prevNodes) => {
+          const sourceNode = prevNodes.find((node) => node.id === edgeToDeletedNode.source);
+          if (!sourceNode) return prevNodes;
+          const placeholder = buildPlaceholder({
+            id: deletedNode.id,
+            position: {
+              y: sourceNode.position.y + (sourceNode.height ?? 0),
+              // Green starting node is not aligned with others, thus small offset is needed
+              x: sourceNode.type === "input" ? sourceNode.position.x - 10.5 * GRID_UNIT : sourceNode.position.x,
+            },
+          });
+          return [...prevNodes, placeholder];
+        });
+
+        prevEdges.push(
+          buildEdge({
+            id: `edge-${edgeToDeletedNode.source}-${deletedNode.id}`,
+            source: edgeToDeletedNode.source,
+            sourceHandle: `handle-${edgeToDeletedNode.source}-1`,
+            target: deletedNode.id,
+          })
+        );
+        return prevEdges;
+      });
+      // get().setIsTestButtonEnabled(false); ??????? onDelete
+  },
+  clickedNode: null,
+  setClickedNode: (clickedNode) => set({ clickedNode }),
 }));
 
 export default useServiceStore;

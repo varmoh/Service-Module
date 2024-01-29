@@ -10,9 +10,7 @@ import ReactFlow, {
   NodeDimensionChange,
   OnEdgesChange,
   OnNodesChange,
-  ReactFlowInstance,
   useUpdateNodeInternals,
-  XYPosition,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import CustomNode from "../Steps/CustomNode";
@@ -22,6 +20,7 @@ import StartNode from "../Steps/StartNode";
 import { useTranslation } from "react-i18next";
 import useServiceStore from "store/new-services.store";
 import { GRID_UNIT } from "types/service-flow";
+import { buildEdge, buildPlaceholder, getEdgeLength } from "services/flow-builder";
 
 const nodeTypes = {
   startNode: StartNode,
@@ -30,12 +29,10 @@ const nodeTypes = {
 };
 
 type FlowBuilderProps = {
-  onNodeEdit: (selectedNode: Node | null) => void;
   updatedRules: { rules: (string | null)[]; rulesData: ConditionRuleType[] };
   nodes: Node[];
   onNodesChange?: OnNodesChange;
   onNodeAdded: () => void;
-  onNodeDelete: () => void;
   edges: Edge[];
   setEdges: (edges: Edge[] | ((prev: Edge[]) => Edge[])) => void;
   setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
@@ -44,7 +41,6 @@ type FlowBuilderProps = {
 };
 
 const FlowBuilder: FC<FlowBuilderProps> = ({
-  onNodeEdit,
   updatedRules,
   nodes,
   setNodes,
@@ -53,25 +49,24 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   setEdges,
   onEdgesChange,
   onNodeAdded,
-  onNodeDelete,
-  description,
-}) => {
+  description,}) => {
   const { t } = useTranslation();
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [clickedNode, setClickedNode] = useState();
+  const clickedNode = useServiceStore(state => state.clickedNode);
+  const setClickedNode = useServiceStore(state => state.setClickedNode);
   const startDragNode = useRef<Node | undefined>(undefined);
   const nodePositionOffset = 28 * GRID_UNIT;
   const updateNodeInternals = useUpdateNodeInternals();
 
   const reactFlowInstance = useServiceStore(state => state.reactFlowInstance);
   const setReactFlowInstance = useServiceStore(state => state.setReactFlowInstance);
+  const handleNodeEdit = useServiceStore.getState().handleNodeEdit;
 
   useEffect(() => {
     useServiceStore.getState().setFlow(JSON.stringify(reactFlowInstance?.toObject()));
   }, [reactFlowInstance]);
 
-  const getEdgeLength = () => 5 * GRID_UNIT;
 
   useEffect(() => {
     setNodes((prevNodes) =>
@@ -112,36 +107,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       });
       return prevNodes;
     });
-  };
-
-  const buildPlaceholder = ({
-    id,
-    matchingPlaceholder,
-    position,
-  }: {
-    id: string;
-    matchingPlaceholder?: Node;
-    position?: XYPosition;
-  }): Node => {
-    if (!matchingPlaceholder && !position) throw Error("Either matchingPlaceholder or position have to be defined.");
-
-    const positionX = position ? position.x : matchingPlaceholder!.position.x;
-    const positionY = position ? position.y : matchingPlaceholder!.position.y + (matchingPlaceholder!.height ?? 0);
-
-    return {
-      id,
-      type: "placeholder",
-      position: {
-        x: positionX,
-        y: getEdgeLength() + positionY,
-      },
-      data: {
-        type: "placeholder",
-      },
-      className: "placeholder",
-      selectable: false,
-      draggable: false,
-    };
   };
 
   const buildRuleWithPlaceholder = ({
@@ -221,28 +186,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     ];
   };
 
-  const buildEdge = ({
-    id,
-    source,
-    sourceHandle,
-    target,
-  }: {
-    id: string;
-    source: string;
-    sourceHandle?: string | null;
-    target: string;
-  }): Edge => {
-    return {
-      id,
-      sourceHandle,
-      source,
-      target,
-      type: "smoothstep",
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-      },
-    };
-  };
 
   // Move the placeholder together with the node being moved
   const onNodeDrag = useCallback(
@@ -473,118 +416,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
     }
   };
 
-  const onDelete = useCallback(
-    (id: string, shouldAddPlaceholder: boolean) => {
-      if (!reactFlowInstance) return;
-      const deletedNode = reactFlowInstance.getNodes().find((node) => node.id === id);
-      const edgeToDeletedNode = reactFlowInstance.getEdges().find((edge) => edge.target === id);
-      if (!deletedNode) return;
-      let updatedNodes: Node[] = [];
-      let currentEdges: Edge[] = [];
-      setEdges((prevEdges) => (currentEdges = prevEdges));
-      setNodes((prevNodes) => {
-        let newNodes: Node[] = [];
-
-        if (deletedNode.data.stepType !== StepType.Input) {
-          // delete only targeted node
-          newNodes.push(...prevNodes.filter((node) => node.id !== id));
-        } else {
-          // delete input node with it's rules
-          const deletedRules = currentEdges.filter((edge) => edge.source === id).map((edge) => edge.target);
-
-          newNodes.push(...prevNodes.filter((node) => node.id !== id && !deletedRules.includes(node.id)));
-        }
-
-        // cleanup leftover placeholders
-        newNodes = newNodes.filter((node) => {
-          if (node.type !== "placeholder") return true;
-
-          const pointingEdge = currentEdges.find((edge) => edge.target === node.id);
-          const pointingEdgeSource = newNodes.find((newNode) => newNode.id === pointingEdge?.source);
-          if (!pointingEdgeSource) return false;
-          return true;
-        });
-
-        updatedNodes = newNodes;
-        return newNodes;
-      });
-
-      setEdges((prevEdges) => {
-        const toRemove = prevEdges.filter((edge) => {
-          if (deletedNode.data.stepType !== StepType.Input) {
-            // remove edges pointing to/from removed node
-            return edge.target === id || edge.source === id;
-          } else {
-            // remove edges not pointing to present nodes
-            return !updatedNodes.map((node) => node.id).includes(edge.target);
-          }
-        });
-
-        if (toRemove.length === 0) return prevEdges;
-        let newEdges = [...prevEdges.filter((edge) => !toRemove.includes(edge))];
-        if (
-          deletedNode.data.stepType !== StepType.Input &&
-          newEdges.length > 0 &&
-          toRemove.length > 1 &&
-          shouldAddPlaceholder
-        ) {
-          // if only 1 node was removed, point edge to whatever it was pointing to
-          newEdges.push(
-            buildEdge({
-              id: `edge-${toRemove[0].source}-${toRemove[toRemove.length - 1].target}`,
-              source: toRemove[0].source,
-              sourceHandle: toRemove[0].sourceHandle,
-              target: toRemove[toRemove.length - 1].target,
-            })
-          );
-        }
-
-        // cleanup possible leftover edges
-        newEdges = newEdges.filter(
-          (edge) =>
-            updatedNodes.find((node) => node.id === edge.source) && updatedNodes.find((node) => node.id === edge.target)
-        );
-
-        return newEdges;
-      });
-
-      if (!edgeToDeletedNode || !shouldAddPlaceholder) return;
-      setEdges((prevEdges) => {
-        // check if previous node points to anything
-        if (prevEdges.find((edge) => edge.source === edgeToDeletedNode.source)) {
-          return prevEdges;
-        }
-
-        // Previous node points to nothing -> add placeholder with edge
-        setNodes((prevNodes) => {
-          const sourceNode = prevNodes.find((node) => node.id === edgeToDeletedNode.source);
-          if (!sourceNode) return prevNodes;
-          const placeholder = buildPlaceholder({
-            id: deletedNode.id,
-            position: {
-              y: sourceNode.position.y + (sourceNode.height ?? 0),
-              // Green starting node is not aligned with others, thus small offset is needed
-              x: sourceNode.type === "input" ? sourceNode.position.x - 10.5 * GRID_UNIT : sourceNode.position.x,
-            },
-          });
-          return [...prevNodes, placeholder];
-        });
-
-        prevEdges.push(
-          buildEdge({
-            id: `edge-${edgeToDeletedNode.source}-${deletedNode.id}`,
-            source: edgeToDeletedNode.source,
-            sourceHandle: `handle-${edgeToDeletedNode.source}-1`,
-            target: deletedNode.id,
-          })
-        );
-        return prevEdges;
-      });
-      onNodeDelete();
-    },
-    [reactFlowInstance, nodes, edges]
-  );
-
   useEffect(() => {
     if (updatedRules.rules.length === 0) return;
     updateInputRules(updatedRules);
@@ -695,15 +526,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
       });
     },
     [edges, nodes]
-  );
-
-  const handleNodeEdit = useCallback(
-    (selectedNodeId: string) => {
-      if (!reactFlowInstance) return;
-      const node = reactFlowInstance.getNode(selectedNodeId);
-      onNodeEdit(node ?? null);
-    },
-    [reactFlowInstance]
   );
 
   return (

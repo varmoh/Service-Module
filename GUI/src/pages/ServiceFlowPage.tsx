@@ -32,12 +32,12 @@ const ServiceFlowPage: FC = () => {
     rules: [],
     rulesData: [],
   });
-  const [selectedNode, setSelectedNode] = useState<Node<NodeDataProps> | null>(null);
   const navigate = useNavigate();
   const description = useServiceStore(state => state.description);
   const availableVariables = useServiceStore(state => state.availableVariables);
   const steps = useServiceStore(state => state.mapEndpointsToSetps());
   const name = useServiceStore(state => state.serviceNameDashed());
+  const selectedNode = useServiceStore(state => state.selectedNode);
   const { id } = useParams();
 
   useEffect(() => {
@@ -66,7 +66,6 @@ const ServiceFlowPage: FC = () => {
   const contentStyle: CSSProperties = { overflowY: "auto", maxHeight: "40vh" };
 
   const handlePopupClose = () => resetStates();
-  const onNodeDelete = () => setIsTestButtonEnabled(false);
   const onNodeAdded = () => setIsTestButtonEnabled(false);
 
   const handlePopupSave = (updatedNode: Node<NodeDataProps>) => {
@@ -102,9 +101,7 @@ const ServiceFlowPage: FC = () => {
     );
   };
 
-  const resetStates = () => {
-    setSelectedNode(null);
-  };
+  const resetStates = () => useServiceStore.getState().setSelectedNode(null);
 
   return (
     <>
@@ -197,7 +194,6 @@ const ServiceFlowPage: FC = () => {
             </Track>
           </div>
           <FlowBuilder
-            onNodeEdit={setSelectedNode}
             updatedRules={updatedRules}
             description={description}
             nodes={nodes}
@@ -207,7 +203,6 @@ const ServiceFlowPage: FC = () => {
             setEdges={setEdges}
             onEdgesChange={onEdgesChange}
             onNodeAdded={onNodeAdded}
-            onNodeDelete={onNodeDelete}
           />
         </div>
       </ReactFlowProvider>
