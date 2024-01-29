@@ -38,6 +38,10 @@ jobs:
 
         cp -R "source-repo/$SOURCE_FOLDER/." "$TARGET_DIRECTORY"
 
+    - name: Clean Up Cloned Repository
+      run: |
+        rm -rf source-repo
+
     - name: Commit and Push Changes
       run: |
         cd "$FOLDER_PATH"
