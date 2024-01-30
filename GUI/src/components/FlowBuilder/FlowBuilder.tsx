@@ -14,8 +14,8 @@ import { ConditionRuleType, StepType } from "../../types";
 import StartNode from "../Steps/StartNode";
 import { useTranslation } from "react-i18next";
 import useServiceStore from "store/new-services.store";
+import { UpdateFlowInputRules, onDrop, onFlowNodeDragStop, onNodeDrag, updateFlowInputRules } from "services/flow-builder";
 import { GRID_UNIT } from "types/service-flow";
-import { UpdateFlowInputRules, buildEdge, onDrop, onFlowNodeDragStop, onNodeDrag, updateFlowInputRules } from "services/flow-builder";
 
 const nodeTypes = {
   startNode: StartNode,

@@ -32,6 +32,7 @@ interface ServiceState {
   setIsCommon: (isCommon: boolean) => void;
   secrets: PreDefinedEndpointEnvVariables;
   availableVariables: PreDefinedEndpointEnvVariables;
+  getFlatVariables: () => string[];
   serviceNameDashed: () => string;
   deleteEndpoint: (id: string) => void;
   isCommonEndpoint: (id: string) => boolean;
@@ -109,6 +110,9 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   },
   secrets: { prod: [], test: [] },
   availableVariables: { prod: [], test: [] },
+  getFlatVariables: () => {
+    return [...get().availableVariables.prod, ...get().availableVariables.test];
+  },
   vaildServiceInfo: () => !!get().name && !!get().description,
   serviceNameDashed: () => get().name.replace(" ", "-"),
   deleteEndpoint: (id: string) => {
@@ -321,7 +325,6 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       endpoints: callback(state.endpoints)
     }));
   },
-
   selectedTab: EndpointEnv.Live,
   setSelectedTab: (tab: EndpointEnv) => set({ selectedTab: tab }),
   isLive: () => get().selectedTab === EndpointEnv.Live,
