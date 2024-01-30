@@ -1,13 +1,11 @@
 import { Node, Edge, MarkerType, XYPosition, NodeChange, NodeDimensionChange } from "reactflow";
 import useServiceStore from "store/new-services.store";
 import { ConditionRuleType, StepType } from "types";
-import { GRID_UNIT } from "types/service-flow";
+import { GRID_UNIT, EDGE_LENGTH } from "types/service-flow";
 
 //
 // TODO: refactor this file
 //
-
-export const getEdgeLength = () => 5 * GRID_UNIT;
 
 export const buildPlaceholder = ({
   id,
@@ -28,7 +26,7 @@ export const buildPlaceholder = ({
     type: "placeholder",
     position: {
       x: positionX,
-      y: getEdgeLength() + positionY,
+      y: EDGE_LENGTH + positionY,
     },
     data: {
       type: "placeholder",
@@ -77,7 +75,7 @@ export const alignNodesInCaseAnyGotOverlapped = (nodeChanges: NodeChange[], prev
     followingNodes.forEach((node) => {
       // If this node is overlapped by the previous one, pull it down
       if (node.position.y <= updatedNode.position.y + (updatedNode.height ?? 0)) {
-        node.position.y = getEdgeLength() + updatedNode.position.y + (updatedNode.height ?? 0);
+        node.position.y = EDGE_LENGTH + updatedNode.position.y + (updatedNode.height ?? 0);
       }
     });
   });
@@ -102,7 +100,7 @@ export const buildRuleWithPlaceholder = ({
   value?: string;
 }): Node[] => {
   const positionX = inputNode.position.x;
-  const positionY = getEdgeLength() + inputNode.position.y + (inputNode.height ?? 0);
+  const positionY = EDGE_LENGTH + inputNode.position.y + (inputNode.height ?? 0);
 
   return [
     {
@@ -299,7 +297,7 @@ export const onNodeDrag = (_event: React.MouseEvent, draggedNode: Node) => {
       placeholders.forEach((placeholder) => {
         if (prevNode.id !== placeholder.id) return;
         prevNode.position.x = draggedNode.position.x;
-        prevNode.position.y = getEdgeLength() + draggedNode.position.y + (draggedNode.height ?? 0);
+        prevNode.position.y = EDGE_LENGTH + draggedNode.position.y + (draggedNode.height ?? 0);
       });
       return prevNode;
     })
