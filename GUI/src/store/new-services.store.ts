@@ -14,7 +14,6 @@ import { editServiceInfo, saveDraft, saveFlowClick } from 'services/service-buil
 import { initialEdge, initialNodes } from 'types/service-flow';
 
 interface ServiceState {
-  flow: string | undefined;
   endpoints: EndpointData[];
   name: string;
   serviceId: string;
@@ -32,6 +31,7 @@ interface ServiceState {
   setIsCommon: (isCommon: boolean) => void;
   secrets: PreDefinedEndpointEnvVariables;
   availableVariables: PreDefinedEndpointEnvVariables;
+  getFlatVariables: () => string[];
   serviceNameDashed: () => string;
   deleteEndpoint: (id: string) => void;
   isCommonEndpoint: (id: string) => boolean;
@@ -59,7 +59,6 @@ interface ServiceState {
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
-  setFlow: (flow: string) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
 }
@@ -100,6 +99,9 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   },
   secrets: { prod: [], test: [] },
   availableVariables: { prod: [], test: [] },
+  getFlatVariables: () => {
+    return [...get().availableVariables.prod, ...get().availableVariables.test];
+  },
   vaildServiceInfo: () => !!get().name && !!get().description,
   serviceNameDashed: () => get().name.replace(" ", "-"),
   deleteEndpoint: (id: string) => {
@@ -149,7 +151,6 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   resetState: () => {
     set({
       name: '',
-      flow: undefined,
       endpoints: [],
       serviceId: uuid(),
       description: '',
@@ -196,9 +197,9 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
     await get().loadSecretVariables();
 
     let nodes: Node[] = [];
-    if(get().flow) {
-      nodes = JSON.parse(get().flow!)?.nodes;
-    }    
+    // if(get().flow) {
+    //   nodes = JSON.parse(get().flow!)?.nodes;
+    // }
     if (nodes?.find((node) => node.data.stepType === "auth")) {
       await get().loadTaraVariables();
     }
@@ -300,8 +301,6 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       endpoints: callback(state.endpoints)
     }));
   },
-  setFlow: (flow) => set({ flow }),
-
   selectedTab: EndpointEnv.Live,
   setSelectedTab: (tab: EndpointEnv) => set({ selectedTab: tab }),
   isLive: () => get().selectedTab === EndpointEnv.Live,
