@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { create } from 'zustand';
 import { v4 as uuid } from "uuid";
-import { Edge, Node, ReactFlowInstance } from "reactflow";
+import { Edge, EdgeChange, Node, NodeChange, NodeDimensionChange, ReactFlowInstance, applyEdgeChanges, applyNodeChanges } from "reactflow";
 import { EndpointData, EndpointEnv, EndpointTab, EndpointVariableData, PreDefinedEndpointEnvVariables } from 'types/endpoint';
 import { getSecretVariables, getServiceById, getTaraAuthResponseVariables } from 'resources/api-constants';
 import { Service, Step, StepType } from 'types';
@@ -12,10 +12,9 @@ import { ROUTES } from 'resources/routes-constants';
 import { NavigateFunction } from 'react-router-dom';
 import { editServiceInfo, saveFlowClick } from 'services/service-builder';
 import { GRID_UNIT, NodeDataProps, initialEdge, initialNodes } from 'types/service-flow';
-import { buildEdge, buildPlaceholder } from 'services/flow-builder';
+import { UpdateFlowInputRules, alignNodesInCaseAnyGotOverlapped, buildEdge, buildPlaceholder, updateFlowInputRules } from 'services/flow-builder';
 
 interface ServiceState {
-  flow: string | undefined;
   endpoints: EndpointData[];
   name: string;
   serviceId: string;
@@ -63,16 +62,19 @@ interface ServiceState {
   onDelete: (id: string, shouldAddPlaceholder: boolean) => void;
   clickedNode: any;
   setClickedNode: (clickedNode: any) => void;
+  onNodesChange: (changes: NodeChange[]) => void;
+  onEdgesChange: (changes: EdgeChange[]) => void;
+  isTestButtonEnabled: boolean;
+  disableTestButton: () => void;
+  enableTestButton: () => void;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
-  setFlow: (flow: string) => void;
   reactFlowInstance: ReactFlowInstance | null;
   setReactFlowInstance: (reactFlowInstance: ReactFlowInstance | null) => void;
 }
 
 const useServiceStore = create<ServiceState>((set, get, store) => ({
-  flow: undefined,
   endpoints: [],
   name: '',
   serviceId: uuid(),
@@ -156,7 +158,6 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
   resetState: () => {
     set({
       name: '',
-      flow: undefined,
       endpoints: [],
       serviceId: uuid(),
       description: '',
@@ -168,10 +169,12 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       isNewService: true,
       edges: [],
       nodes: [],
+      isTestButtonEnabled: true,
     })
   },
   loadService: async (id) => {
     get().resetState();
+    let nodes = get().nodes;
 
     if(id) {
       const service = await axios.get<Service[]>(getServiceById(id));
@@ -179,7 +182,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       const structure = JSON.parse(service.data[0].structure.value);
       let endpoints = JSON.parse(service.data[0].endpoints.value);
       let edges = structure?.edges;
-      let nodes = structure?.nodes;
+      nodes = structure?.nodes;
 
       if(!edges || edges.length === 0)
         edges = [initialEdge];
@@ -197,7 +200,7 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
           onDelete: get().onDelete,
           setClickedNode: get().setClickedNode,
           onEdit: get().handleNodeEdit,
-          // update: updateInputRules, //////////////// to do later
+          update: updateFlowInputRules,
         };
         return node;
       });
@@ -216,14 +219,11 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
 
     await get().loadSecretVariables();
 
-    let nodes: Node[] = [];
-    if(get().flow) {
-      nodes = JSON.parse(get().flow!)?.nodes;
-    }    
-    if (nodes?.find((node) => node.data.stepType === "auth")) {
+    if (nodes?.find(node => node.data.stepType === "auth")) {
       await get().loadTaraVariables();
     }
-    const variables = nodes?.filter((node) => node.data.stepType === "input")
+
+    const variables = nodes?.filter(node => node.data.stepType === "input")
       .map((node) => `{{ClientInput_${node.data.clientInputId}}}`);
 
     get().addProductionVariables(variables);
@@ -321,7 +321,6 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
       endpoints: callback(state.endpoints)
     }));
   },
-  setFlow: (flow) => set({ flow }),
 
   selectedTab: EndpointEnv.Live,
   setSelectedTab: (tab: EndpointEnv) => set({ selectedTab: tab }),
@@ -531,10 +530,28 @@ const useServiceStore = create<ServiceState>((set, get, store) => ({
         );
         return prevEdges;
       });
-      // get().setIsTestButtonEnabled(false); ??????? onDelete
+      // get().setIsTestButtonEnabled(false); ??????? to do later 
   },
   clickedNode: null,
   setClickedNode: (clickedNode) => set({ clickedNode }),
+
+  onNodesChange: (changes: NodeChange[]) => {
+    get().setNodes((prevNode) => {
+      const changedNodes = applyNodeChanges(changes, prevNode);
+      const newNodes = alignNodesInCaseAnyGotOverlapped(changes, changedNodes, get().edges);
+      return newNodes;
+    })
+  },
+  onEdgesChange: (changes: EdgeChange[]) => {
+    get().setEdges((eds) => applyEdgeChanges(changes, eds))
+  },
+  isTestButtonEnabled: true,
+  disableTestButton: () => {
+    set({ isTestButtonEnabled: false });
+  },
+  enableTestButton: () => {
+    set({ isTestButtonEnabled: true });
+  },
 }));
 
 export default useServiceStore;
