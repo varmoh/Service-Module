@@ -42,6 +42,7 @@ export type NodeDataProps = {
   linkText?: string;
   fileName?: string;
   fileContent?: string;
+  signOption?: string;
 };
 
 export const initialNodes: Node[] = [
