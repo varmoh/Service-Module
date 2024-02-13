@@ -50,11 +50,7 @@ const ServiceFlowPage: FC = () => {
   
   const setNodes = useServiceStore((state) => state.setNodes);
   const setEdges = useServiceStore((state) => state.setEdges);
-
-  const onNodesChange = useCallback((changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
-  const onEdgesChange = useCallback((changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)), []);
-  const [isTestButtonVisible, setIsTestButtonVisible] = useState(false);
-  const isTestButtonEnabled = useServiceStore(state => state.isTestButtonEnabled);
+  const availableVariables = useServiceStore((state) => state.availableVariables);
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, step: Step) => {
     event.dataTransfer.setData("application/reactflow-label", step.label);
