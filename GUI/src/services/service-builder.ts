@@ -372,19 +372,19 @@ export async function saveEndpoints(
     const result = Object.fromEntries(steps.entries());
 
     tasks.push(axios.post(
-        jsonToYml(),
-        { result },
-        {
-          params: {
-            location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${endpoint.isCommon ? "common/" : ""
-              }${endpointName}.yml`,
-          },
-        }
+      jsonToYml(),
+      { result },
+      {
+        params: {
+          location: `/Ruuter/${selectedEndpointType.methodType.toUpperCase()}/services/endpoints/${endpoint.isCommon ? "common/" : ""
+            }${endpointName}.yml`,
+        },
+      }
     ));
   }
 
   tasks.push(axios.post(updateServiceEndpoints(id), {
-      endpoints: JSON.stringify(endpoints),
+    endpoints: JSON.stringify(endpoints),
   }));
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
@@ -518,7 +518,7 @@ export const saveFlow = async (
 
     await axios
       .post(
-        isNewService ? createNewService() : editService(serviceId) ,
+        isNewService ? createNewService() : editService(serviceId),
         {
           name,
           serviceId,
@@ -808,25 +808,25 @@ export const editServiceInfo = async () => {
   const tasks: Promise<any>[] = [];
 
   tasks.push(axios.post(editService(serviceId), {
-      name,
-      description,
-      type: "POST",
-    }
+    name,
+    description,
+    type: "POST",
+  }
   ));
 
   tasks.push(axios.post(updateServiceEndpoints(serviceId), { /// TODO: edit endpoints dsl as in `saveEndpoints`
-      endpoints: JSON.stringify(endpoints),
+    endpoints: JSON.stringify(endpoints),
   }))
 
   await Promise.all(tasks)
-  .then(() => useToastStore.getState().success({
-    title: i18next.t("newService.toast.success"),
-    message: i18next.t("newService.toast.savedSuccessfully"),
-  }))
-  .catch((e) => {
-    useToastStore.getState().error({
-      title: i18next.t("newService.toast.saveFailed"),
-      message: e?.message,
+    .then(() => useToastStore.getState().success({
+      title: i18next.t("newService.toast.success"),
+      message: i18next.t("newService.toast.savedSuccessfully"),
+    }))
+    .catch((e) => {
+      useToastStore.getState().error({
+        title: i18next.t("newService.toast.saveFailed"),
+        message: e?.message,
+      });
     });
-  });
 }
