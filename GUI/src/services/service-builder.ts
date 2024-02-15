@@ -1,12 +1,12 @@
 import axios from "axios";
 import i18next from 'i18next';
 import { Edge, Node } from "reactflow";
-import { 
-  createNewService, 
-  editService, 
-  updateServiceEndpoints, 
-  jsonToYml, 
-  testService, 
+import {
+  createNewService,
+  editService,
+  updateServiceEndpoints,
+  jsonToYml,
+  testService,
 } from "resources/api-constants";
 import useServiceStore from "store/new-services.store";
 import useToastStore from "store/toasts.store";
@@ -392,7 +392,7 @@ export async function saveEndpoints(
   }
 
   tasks.push(axios.post(updateServiceEndpoints(id), {
-      endpoints: JSON.stringify(serviceEndpoints),
+    endpoints: JSON.stringify(serviceEndpoints),
   }));
 
   await Promise.all(tasks).then(onSuccess).catch(onError);
@@ -808,7 +808,7 @@ export const editServiceInfo = async () => {
   }
   ));
 
-   await saveEndpoints(endpoints, endPointsName, () => {}, (_) => {}, serviceId);
+  await saveEndpoints(endpoints, endPointsName, () => { }, (_) => { }, serviceId);
 
   await Promise.all(tasks)
     .then(() => useToastStore.getState().success({
