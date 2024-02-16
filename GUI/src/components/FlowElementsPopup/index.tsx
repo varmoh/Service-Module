@@ -156,7 +156,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
 
   return (
     <Popup
-      style={{ maxWidth: 700 }}
+      style={{ maxWidth: 700, overflow: 'visible' }}
       title={title}
       onClose={() => {
         resetStates();
@@ -221,7 +221,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
                 defaultWebpageName={node.data.linkText ?? webpageName ?? undefined}
               />
             )}
-            {stepType === StepType.Rule && (
+            {stepType === StepType.Input && (
               <DndProvider backend={HTML5Backend}>
                 <ConditionBuilderContent />
               </DndProvider>

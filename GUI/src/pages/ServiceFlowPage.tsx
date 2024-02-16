@@ -20,7 +20,6 @@ const ServiceFlowPage: FC = () => {
     { id: 10, label: t("serviceFlow.element.taraAuthentication"), type: StepType.Auth },
     { id: 20, label: t("serviceFlow.element.textfield"), type: StepType.Textfield },
     { id: 30, label: t("serviceFlow.element.clientInput"), type: StepType.Input },
-    { id: 35, label: t("serviceFlow.element.rules"), type: StepType.Rule },
     { id: 40, label: t("serviceFlow.element.rasaRules"), type: StepType.RasaRules },
     { id: 50, label: t("serviceFlow.element.openNewWebpage"), type: StepType.OpenWebpage },
     { id: 60, label: t("serviceFlow.element.fileGeneration"), type: StepType.FileGenerate },
