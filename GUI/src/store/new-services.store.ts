@@ -197,8 +197,8 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
     if(id) {
       const service = await axios.get<Service[]>(getServiceById(id));
       
-      const structure = JSON.parse(service.data[0].structure.value);
-      let endpoints = JSON.parse(service.data[0].endpoints.value);
+      const structure = JSON.parse(service.data[0].structure?.value ?? '{}');
+      let endpoints = JSON.parse(service.data[0].endpoints?.value ?? '{}');
       let edges = structure?.edges;
       nodes = structure?.nodes;
 
@@ -211,7 +211,7 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       if(!endpoints || !(endpoints instanceof Array))
         endpoints = [];
 
-        nodes = nodes.map((node: any) => {
+      nodes = nodes.map((node: any) => {
         if (node.type !== "customNode") return node;
         node.data = {
           ...node.data,
