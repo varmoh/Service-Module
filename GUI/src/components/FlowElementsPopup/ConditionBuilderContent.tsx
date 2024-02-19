@@ -3,14 +3,14 @@ import { useTranslation } from "react-i18next";
 import { SwitchBox } from "../FormElements";
 import YesNoPopupContent from "./YesNoPopupContent";
 import RuleBuilder from "./RuleBuilder";
-import useFlowStore from "store/flow.store";
 import { Track } from "..";
 import "./styles.scss";
+import useServiceStore from "store/new-services.store";
 
 const ConditionBuilderContent: React.FC = () => {
   const { t } = useTranslation();
-  const isYesNoQuestion = useFlowStore(state => state.isYesNoQuestion);
-  const rules = useFlowStore(state => state.rules);
+  const isYesNoQuestion = useServiceStore(state => state.isYesNoQuestion);
+  const rules = useServiceStore(state => state.rules);
 
   return (
     <Track direction="vertical" align="stretch">
@@ -20,7 +20,7 @@ const ConditionBuilderContent: React.FC = () => {
             label=""
             name=""
             hideLabel
-            onCheckedChange={useFlowStore.getState().setIsYesNoQuestion}
+            onCheckedChange={useServiceStore.getState().setIsYesNoQuestion}
             checked={isYesNoQuestion}
           />
         </Track>
@@ -28,7 +28,7 @@ const ConditionBuilderContent: React.FC = () => {
       </Track>
       {isYesNoQuestion && <YesNoPopupContent />}
       {!isYesNoQuestion && <RuleBuilder 
-        onChange={useFlowStore.getState().changeRulesNode} 
+        onChange={useServiceStore.getState().changeRulesNode} 
         seedGroup={rules}
       />}
     </Track>

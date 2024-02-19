@@ -1,8 +1,11 @@
 import React from 'react';
-import { conditionOptions } from 'store/flow.store';
 import { Rule } from './types';
 import { FormInput, FormSelect, Icon, Track } from 'components';
 import { MdDeleteOutline } from 'react-icons/md';
+
+export const conditionOptions = [ 
+  '==', '===', '!=', '!==', '>', '<', '>=', '<='
+].map(x => ({ label: x, value: x }));
 
 interface RuleElementProps {
   rule: Rule;

@@ -13,6 +13,7 @@ import { NavigateFunction } from 'react-router-dom';
 import { editServiceInfo, saveFlowClick } from 'services/service-builder';
 import { GRID_UNIT, NodeDataProps, initialEdge, initialNodes } from 'types/service-flow';
 import { alignNodesInCaseAnyGotOverlapped, buildEdge, buildPlaceholder, updateFlowInputRules } from 'services/flow-builder';
+import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
 
 interface ServiceStoreState {
   endpoints: EndpointData[];
@@ -24,6 +25,10 @@ interface ServiceStoreState {
   nodes: Node[],
   isNewService: boolean,
   serviceState: ServiceState;
+  rules: GroupOrRule[];
+  isYesNoQuestion: boolean;
+  setIsYesNoQuestion: (value: boolean) => void;
+  changeRulesNode: (rules: GroupOrRule[]) => void;
   markAsNewService: () => void,
   unmarkAsNewService: () => void,
   setServiceId: (id: string) => void,
@@ -59,6 +64,7 @@ interface ServiceStoreState {
   updateEndpointRawData: (rawData: RequestVariablesTabsRawData, endpointDataId?: string, parentEndpointId?: string) => void;
   updateEndpointData: (data: RequestVariablesTabsRowsData, endpointDataId?: string, parentEndpointId?:string) => void;
   resetState: () => void;
+  resetRules: () => void;
   onContinueClick: (navigate: NavigateFunction) => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
@@ -91,6 +97,10 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   serviceState: ServiceState.Draft,
   isTestButtonVisible: false,
   isTestButtonEnabled: true,
+  rules: [],
+  isYesNoQuestion: false,
+  setIsYesNoQuestion: (value: boolean) => set({ isYesNoQuestion: value }),
+  changeRulesNode: (rules) =>  set({ rules }),
   disableTestButton: () => set({ 
     isTestButtonEnabled: false,
   }),
@@ -190,8 +200,11 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
       edges: [initialEdge],
       nodes: initialNodes,
       isTestButtonEnabled: true,
+      rules: [],
+      isYesNoQuestion: false,
     })
   },
+  resetRules: () => set({ rules: [], isYesNoQuestion: false, }),
   loadService: async (id) => {
     get().resetState();
     let nodes = get().nodes;
