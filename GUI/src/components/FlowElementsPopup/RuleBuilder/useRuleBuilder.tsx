@@ -9,8 +9,10 @@ interface UseRuleBuilderProps {
 }
 
 export const useRuleBuilder = (config: UseRuleBuilderProps) => {
-  const [elements, setElements] = useState<GroupOrRule[]>(config.root ? (config.seedGroup?.children ?? []) : config.group!.children);
-  const [groupInfo, setGroupInfo] = useState<Group>(config.root ? (config.seedGroup ?? getInitialGroup()) : config.group!);
+  const elementsInitialValue = config.root ? (config.seedGroup?.children ?? []) : config.group!.children;
+  const groupInfoInitialValue = config.root ? (config.seedGroup?.length > 0 ? config.seedGroup: getInitialGroup()) : config.group!
+  const [elements, setElements] = useState<GroupOrRule[]>(elementsInitialValue);
+  const [groupInfo, setGroupInfo] = useState<Group>(groupInfoInitialValue);
 
   useEffect(() => {
     config.onChange({
