@@ -16,39 +16,24 @@ import axios from "axios";
 import { servicesRequestsExplain } from "../../resources/api-constants";
 import OpenWebPageContent from "./OpenWebPageContent";
 import OpenWebPageTestContent from "./OpenWebPageTestContent";
-import { Node } from "reactflow";
 import RasaRulesContent from "./RasaRulesContent";
-import { ConditionRuleType, StepType } from "../../types";
+import { StepType } from "../../types";
 import useServiceStore from "store/new-services.store";
 import useFlowStore from "store/flow.store";
 import FileSignContent from "./FileSignContent";
 import "./styles.scss";
 
-interface FlowElementsPopupProps {
-  node: any;
-  onClose: () => void;
-  onSave: (updatedNode: Node) => void;
-  onRulesUpdate: (rules: (string | null)[], rulesData: ConditionRuleType[]) => void;
-  oldRules: (string | null)[];
-}
-
-const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
-  node,
-  onClose,
-  onSave,
-  oldRules,
-  onRulesUpdate,
-}) => {
+const FlowElementsPopup: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isJsonRequestVisible, setIsJsonRequestVisible] = useState(false);
   const [jsonRequestContent, setJsonRequestContent] = useState<string | null>(null);
+  const node = useServiceStore(state => state.selectedNode);
 
   const isUserDefinedNode = node?.data?.stepType === "user-defined";
 
   const endpoints = useServiceStore(state => state.endpoints);
   const rules = useFlowStore(state => state.rules);
-  const isYesNoQuestion = useFlowStore(state => state.isYesNoQuestion);
 
   useEffect(() => {
     if (node) node.data.rules = rules;
@@ -72,16 +57,11 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
   const title = node.data.label;
   const isReadonly = node.data.readonly;
 
+  const onClose = () => useServiceStore.getState().resetSelectedNode();
+
   const handleSaveClick = () => {
     if (stepType === StepType.Input) {
-      const count = isYesNoQuestion ? 2 : rules.length;
-      const result = [];
-      for (let i = 0; i < count; i++) {
-        let item = null;
-        if (i < oldRules.length) item = oldRules[i];
-        result.push(item);
-      }
-      return onRulesUpdate(result, rules);
+      useFlowStore.getState().handleSaveNode();
     }
     const updatedNode = {
       ...node,
@@ -95,7 +75,7 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
         signOption: signOption ?? node.data?.signOption,
       },
     };
-    onSave(updatedNode);
+    useServiceStore.getState().handlePopupSave(updatedNode);
   };
 
   const handleJsonRequestClick = async () => {

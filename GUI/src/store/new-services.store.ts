@@ -62,6 +62,7 @@ interface ServiceStoreState {
   onContinueClick: (navigate: NavigateFunction) => Promise<void>;
   selectedNode: Node<NodeDataProps> | null;
   setSelectedNode: (node: Node<NodeDataProps> | null | undefined) => void;
+  resetSelectedNode: () => void;
   handleNodeEdit: (selectedNodeId: string) => void;
   onDelete: (id: string, shouldAddPlaceholder: boolean) => void;
   clickedNode: any;
@@ -71,6 +72,7 @@ interface ServiceStoreState {
   isTestButtonEnabled: boolean;
   disableTestButton: () => void;
   enableTestButton: () => void;
+  handlePopupSave: (updatedNode: Node<NodeDataProps>) => void;
 
   // TODO: remove the following funtions and refactor the code to use more specific functions
   setEndpoints: (callback: (prev: EndpointData[]) => EndpointData[]) => void;
@@ -563,6 +565,40 @@ const useServiceStore = create<ServiceStoreState>((set, get, store) => ({
   onEdgesChange: (changes: EdgeChange[]) => {
     get().setEdges((eds) => applyEdgeChanges(changes, eds))
   },
+  resetSelectedNode: () => set({ selectedNode: null }),
+  handlePopupSave: (updatedNode) => {
+    const selectedNode = get().selectedNode;
+    get().resetSelectedNode();
+    if (selectedNode?.data.stepType === StepType.FinishingStepEnd) return;
+
+    get().setNodes((prevNodes) =>
+      prevNodes.map((prevNode) => {
+        if (prevNode.id !== selectedNode!.id) return prevNode;
+        if (
+          prevNode.data.message != updatedNode.data.message ||
+          prevNode.data.link != updatedNode.data.link ||
+          prevNode.data.linkText != updatedNode.data.linkText ||
+          prevNode.data.fileName != updatedNode.data.fileName ||
+          prevNode.data.fileContent != updatedNode.data.fileContent ||
+          prevNode.data.signOption != updatedNode.data.signOption
+        ) {
+          useServiceStore.getState().disableTestButton();
+        }
+        return {
+          ...prevNode,
+          data: {
+            ...prevNode.data,
+            message: updatedNode.data.message,
+            link: updatedNode.data.link,
+            linkText: updatedNode.data.linkText,
+            fileName: updatedNode.data.fileName,
+            fileContent: updatedNode.data.fileContent,
+            signOption: updatedNode.data.signOption,
+          },
+        };
+      })
+    );
+  }
 }));
 
 export default useServiceStore;

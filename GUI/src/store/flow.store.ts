@@ -11,6 +11,7 @@ interface FlowState {
   setIsYesNoQuestion: (value: boolean) => void;
   setRules: (rules: ConditionRuleType[], isYesNoQuestion: boolean) => void;
   reset: () => void;
+  handleSaveNode: () => void; 
 }
 
 const useFlowStore = create<FlowState>((set, get, store) => ({
@@ -74,6 +75,17 @@ const useFlowStore = create<FlowState>((set, get, store) => ({
       isYesNoQuestion: value,
     });
   },
+  handleSaveNode: () => {
+    // const isYesNoQuestion = get().isYesNoQuestion;
+    // const count = isYesNoQuestion ? 2 : rules.length;
+    // const result = [];
+    // for (let i = 0; i < count; i++) {
+    //   let item = null;
+    //   if (i < oldRules.length) item = oldRules[i];
+    //   result.push(item);
+    // }
+    // return onRulesUpdate(result, rules);
+  }
 }));
 
 export default useFlowStore;
