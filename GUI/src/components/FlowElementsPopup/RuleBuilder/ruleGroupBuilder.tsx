@@ -1,10 +1,10 @@
 import React from 'react';
+import { MdDeleteOutline } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
+import { Icon, Track } from 'components';
 import { Group, Rule, RuleGroupBuilderProps, isInstanceOfRule } from './types';
 import RuleElement from './ruleElement';
 import { useRuleBuilder } from './useRuleBuilder';
-import { Icon, Track } from 'components';
-import { MdDeleteOutline } from 'react-icons/md';
 
 const RuleGroupBuilder: React.FC<RuleGroupBuilderProps> = ({ group, onRemove, onChange }) => {
   const { t } = useTranslation();
@@ -18,6 +18,7 @@ const RuleGroupBuilder: React.FC<RuleGroupBuilderProps> = ({ group, onRemove, on
     changeToAnd,
     changeToOr,
     changeRule,
+    onSubGroupChange,
   } = useRuleBuilder({ 
     group,
     root: !onRemove,
@@ -61,7 +62,7 @@ const RuleGroupBuilder: React.FC<RuleGroupBuilderProps> = ({ group, onRemove, on
         elements.map(element =>
           isInstanceOfRule(element)
             ? <RuleElement key={element.id} rule={element as Rule} onRemove={remove} onChange={changeRule} />
-            : <RuleGroupBuilder key={element.id} group={element as Group} onRemove={remove} onChange={onChange} />
+            : <RuleGroupBuilder key={element.id} group={element as Group} onRemove={remove} onChange={onSubGroupChange(element.id)} />
         )
       }
     </Track>

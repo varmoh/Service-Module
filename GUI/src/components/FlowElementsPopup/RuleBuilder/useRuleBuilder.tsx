@@ -53,6 +53,15 @@ export const useRuleBuilder = (config: UseRuleBuilderProps) => {
     }));
   }
 
+  const onSubGroupChange = (parentId: string) => (rule: any) => {
+    setElements(elements.map(x => {
+      if (x.id === parentId) {
+        return {...rule};
+      }
+      return x;
+    }));
+  } 
+
   return { 
     groupInfo, 
     elements, 
@@ -63,5 +72,6 @@ export const useRuleBuilder = (config: UseRuleBuilderProps) => {
     changeToAnd, 
     changeToOr, 
     changeRule,
+    onSubGroupChange,
   };
 }
