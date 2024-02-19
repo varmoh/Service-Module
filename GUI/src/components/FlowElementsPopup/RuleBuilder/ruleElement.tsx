@@ -36,6 +36,7 @@ const RuleElement: React.FC<RuleElementProps> = ({ rule, onRemove, onChange }) =
         />
         <FormSelect
           value={rule.operator}
+          defaultValue={rule.operator}
           name='operator'
           onSelectionChange={handleSelectionChange}
           options={conditionOptions}

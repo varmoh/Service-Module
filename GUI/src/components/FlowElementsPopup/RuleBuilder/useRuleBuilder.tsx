@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { Group, GroupType, Rule, getInitialGroup, getInitialRule } from "./types";
+import { Group, GroupOrRule, GroupType, Rule, getInitialGroup, getInitialRule } from "./types";
 
 interface UseRuleBuilderProps {
   group?: Group;
   root?: boolean;
   onChange: (group: Group) => void;
+  seedGroup?: any;
 }
 
 export const useRuleBuilder = (config: UseRuleBuilderProps) => {
-  const [groupInfo, setGroupInfo] = useState<Group>(config.root ? getInitialGroup() : config.group!);
-  const [elements, setElements] = useState<(Group | Rule)[]>(config.root ? [] : config.group!.children);
+  const [elements, setElements] = useState<GroupOrRule[]>(config.root ? (config.seedGroup?.children ?? []) : config.group!.children);
+  const [groupInfo, setGroupInfo] = useState<Group>(config.root ? (config.seedGroup ?? getInitialGroup()) : config.group!);
 
   useEffect(() => {
     config.onChange({
@@ -44,23 +45,14 @@ export const useRuleBuilder = (config: UseRuleBuilderProps) => {
   const changeToAnd = changeType('and');
   const changeToOr = changeType('or');
 
-  const changeRule = (rule: Rule) => {
-    setElements(elements.map(x => {
-      if (x.id === rule.id) {
-        return {...rule};
-      }
-      return x;
-    }));
-  }
+  const changeRule = (rule: Rule) => setElementById(rule.id, rule);
+  
+  const onSubGroupChange = (parentId: string) => (rule: any) => setElementById(parentId, rule);
 
-  const onSubGroupChange = (parentId: string) => (rule: any) => {
-    setElements(elements.map(x => {
-      if (x.id === parentId) {
-        return {...rule};
-      }
-      return x;
-    }));
-  } 
+  const setElementById = (id: string, element: GroupOrRule) => {
+    const newElements = elements.map(x => x.id === id ? { ...element } : x);
+    setElements(newElements);
+  }
 
   return { 
     groupInfo, 

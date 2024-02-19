@@ -1,27 +1,22 @@
 import { create } from 'zustand';
-import { v4 as uuidv4 } from "uuid";
-import { ConditionRuleType } from 'types';
+import { GroupOrRule } from 'components/FlowElementsPopup/RuleBuilder/types';
 
 interface FlowState {
-  rules: ConditionRuleType[];
-  addRule: () => void;
-  removeRule: (id: string) => void;
-  handleFieldChange: (id: string, field: string, value?: string) => void;
+  rules: GroupOrRule[];
   isYesNoQuestion: boolean;
   setIsYesNoQuestion: (value: boolean) => void;
-  setRules: (rules: ConditionRuleType[], isYesNoQuestion: boolean) => void;
+  changeRulesNode: (rules: GroupOrRule[]) => void;
   reset: () => void;
-  handleSaveNode: () => void; 
 }
 
 const useFlowStore = create<FlowState>((set, get, store) => ({
   rules: [],
   isYesNoQuestion: false,
-  setRules: (rules, isYesNoQuestion) => {
-    set({
-      rules,
-      isYesNoQuestion,
-    });
+  setIsYesNoQuestion: (value: boolean) => {
+    set({ isYesNoQuestion: value });
+  },
+  changeRulesNode: (rules) => {
+    set({ rules });
   },
   reset: () => {
     set({
@@ -29,63 +24,6 @@ const useFlowStore = create<FlowState>((set, get, store) => ({
       isYesNoQuestion: false,
     });
   },
-  addRule: () => {
-    set(state => ({
-      rules: [
-        ...state.rules,
-        {
-          id: uuidv4(),
-          name: '',
-          value: '',
-          condition: conditionOptions[0].value,
-        }
-      ]
-    }))
-  },
-  removeRule: (id: string) => {
-    set(state => ({
-      rules: state.rules.filter(x => x.id !== id),
-    }))
-  },
-  handleFieldChange: (id: string, field: string, value?: string) => {
-    if (!value) return;
-    const updater = (x: any) => x.id === id ? { ...x, [field]: value } : x;
-    set(state => ({
-      rules: state.rules.map(updater),
-    }));
-  },
-  setIsYesNoQuestion: (value: boolean) => {
-    const rules = !value ? [] : [
-      {
-        id: uuidv4(),
-        name: '',
-        condition: 'Yes',
-        value: '',
-      },
-      {
-        id: uuidv4(),
-        name: '',
-        condition: 'No',
-        value: '',
-      },
-    ];
-
-    set({
-      rules,
-      isYesNoQuestion: value,
-    });
-  },
-  handleSaveNode: () => {
-    // const isYesNoQuestion = get().isYesNoQuestion;
-    // const count = isYesNoQuestion ? 2 : rules.length;
-    // const result = [];
-    // for (let i = 0; i < count; i++) {
-    //   let item = null;
-    //   if (i < oldRules.length) item = oldRules[i];
-    //   result.push(item);
-    // }
-    // return onRulesUpdate(result, rules);
-  }
 }));
 
 export default useFlowStore;
