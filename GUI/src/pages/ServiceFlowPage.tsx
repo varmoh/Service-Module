@@ -40,13 +40,13 @@ const ServiceFlowPage: FC = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    if(!id) return;
+    if (!id) return;
     useServiceStore.getState().loadService(id);
   }, [])
 
   const edges = useServiceStore((state) => state.edges);
   const nodes = useServiceStore((state) => state.nodes);
-  
+
   const setNodes = useServiceStore((state) => state.setNodes);
   const setEdges = useServiceStore((state) => state.setEdges);
   const availableVariables = useServiceStore((state) => state.availableVariables);
