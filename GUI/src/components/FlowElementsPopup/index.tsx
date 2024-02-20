@@ -221,12 +221,11 @@ const FlowElementsPopup: React.FC<FlowElementsPopupProps> = ({
                 defaultWebpageName={node.data.linkText ?? webpageName ?? undefined}
               />
             )}
-            {stepType === StepType.Rule && (
-                <DndProvider backend={HTML5Backend}>
-                  <ConditionBuilderContent />
-                </DndProvider>
-              )
-            }
+            {stepType === StepType.Input && (
+              <DndProvider backend={HTML5Backend}>
+                <ConditionBuilderContent />
+              </DndProvider>
+            )}
             {stepType === StepType.FileGenerate && (
               <DndProvider backend={HTML5Backend}>
                 <FileGenerateContent
