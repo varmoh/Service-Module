@@ -43,27 +43,6 @@ const FlowBuilder: FC<FlowBuilderProps> = ({
   const reactFlowInstance = useServiceStore(state => state.reactFlowInstance);
   const setReactFlowInstance = useServiceStore(state => state.setReactFlowInstance);
 
-  // const updateNodeInternals = useUpdateNodeInternals();
-  // const updateInputRules = useCallback((rules: UpdateFlowInputRules) => 
-  //   updateFlowInputRules(rules, updateNodeInternals),
-  // []);
-
-  // useEffect(() => {
-  //   setNodes((prevNodes) =>
-  //     prevNodes.map((node) => {
-  //       if (node.type !== "customNode") return node;
-  //       node.data = {
-  //         ...node.data,
-  //         onDelete,
-  //         onEdit: handleNodeEdit,
-  //         setClickedNode,
-  //         update: updateInputRules,
-  //       };
-  //       return node;
-  //     })
-  //   );
-  // }, [reactFlowInstance]);
-
   const onNodeDragStart = useCallback(
     (_: any, draggedNode: Node) => {
       if (!reactFlowInstance || !reactFlowWrapper.current) return;

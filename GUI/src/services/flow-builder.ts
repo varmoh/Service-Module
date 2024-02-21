@@ -396,7 +396,6 @@ export const onDrop = (
           ].includes(type),
           childrenCount: type === StepType.Input ? 0 : 1,
           setClickedNode: useServiceStore.getState().setClickedNode,
-          // update: updateInputRules,
           message: setDefaultMessages(type),
         },
         className: [StepType.FinishingStepEnd, StepType.FinishingStepRedirect].includes(type)
