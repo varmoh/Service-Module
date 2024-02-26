@@ -112,14 +112,14 @@ const FlowElementsPopup: React.FC = () => {
 
       if (!endpoint) return;
 
-      const response = {
+      const response = await axios.post(servicesRequestsExplain(), {
         url: endpoint.url,
         method: endpoint.methodType,
         headers: extractMapValues(endpoint.headers),
         body: extractMapValues(endpoint.body),
         params: extractMapValues(endpoint.params),
-      };
-      setJsonRequestContent(response);
+      });
+      setJsonRequestContent(response.data);
       setIsJsonRequestVisible(true);
     } catch (error) {
       console.error("Error: ", error);
