@@ -133,7 +133,8 @@
       "states": {
         "active": "Active",
         "inactive": "Inactive",
-        "draft": "Draft"
+        "draft": "Draft",
+        "ready": "Ready"
       },
       "toast": {
         "deleted": "Service has been successfully deleted",
@@ -147,8 +148,16 @@
     "popup": {
       "delete": "Are you sure that you want to delete the service?",
       "setActive": "Are you sure you want to activate this service?",
+      "setReady": "Are you sure you want to mark this service as ready?",
+      "setDraft": "Are you sure you want to mark this service as draft?",
       "setInactive": "Are you sure you want to deactivate this service?",
-      "setState": "Update state"
+      "setState": "Update state",
+      "checking": "Checking if service is connected to an intent",
+      "setToDraft": "Set to draft",
+      "connectToIntent": "Connect to intent",
+      "intentNotConnected": "Service is not connected to an intent, do you want to connect it?",
+      "activateService": "Activate service",
+      "setToReady": "Set to ready"
     }
   },
   "newService": {

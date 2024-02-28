@@ -14,8 +14,9 @@ export const getEndpointValidationMock = (): string => `${baseUrl}/mocks/validat
 export const getEndpointValidation = (): string => `${baseUrl}/services/endpoint-url-validation`;
 export const deleteService = (): string => `${baseUrl}/services/delete`;
 export const changeServiceStatus = (): string => `${baseUrl}/services/status`;
+export const changeIntentConnection = (): string => `${baseUrl}/services/check-intent-connection`;
 export const createNewService = (): string => `${baseUrl}/services/add`;
-export const testService = (state: ServiceState, serviceName: string): string => 
+export const testService = (state: ServiceState, serviceName: string): string =>
   `${baseUrl}/services/${state.toLowerCase()}/${serviceName}`;
 export const editService = (id: string): string => `${baseUrl}/services/edit?id=${id}`;
 export const getServicesList = (): string => `${baseUrl}/services`;

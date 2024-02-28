@@ -133,7 +133,8 @@
       "states": {
         "active": "Aktiivne",
         "inactive": "Mitteaktiivne",
-        "draft": "Mustand"
+        "draft": "Mustand",
+        "ready": "Valmis"
       },
       "toast": {
         "deleted": "Teenus kustutatud",
@@ -147,8 +148,16 @@
     "popup": {
       "delete": "Kas oled kindel, et soovid teenuse kustutada?",
       "setActive": "Kas oled kindel, et tahad teenuse aktiveerida?",
+      "setReady": "Kas olete kindel, et soovite selle teenuse valmisolekuks märkida?",
+      "setDraft": "Kas olete kindel, et soovite selle teenuse mustandiks märkida?",
       "setInactive": "Kas oled kindel, et tahad teenuse deaktiveerida?",
-      "setState": "Uuenda olek"
+      "setState": "Uuenda olek",
+      "checking": "Kontrollitakse, kas teenus on kavatsusega ühendatud",
+      "setToDraft": "Määra mustandiks",
+      "connectToIntent": "Ühendage kavatsusega",
+      "intentNotConnected": "Teenus ei ole kavatsusega ühendatud, kas soovite selle ühendada?",
+      "activateService": "Aktiveerige teenus",
+      "setToReady": "Seadke valmisolekusse"
     }
   },
   "newService": {
