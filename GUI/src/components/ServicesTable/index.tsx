@@ -174,7 +174,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
               disabled={
                 isCommon === true && !userInfo?.authorities.includes("ROLE_ADMINISTRATOR")
                   ? true
-                  : props.row.original.state === ServiceState.Active
+                  : props.row.original.state === ServiceState.Active || props.row.original.state === ServiceState.Ready
               }
               appearance="text"
               onClick={() => {
