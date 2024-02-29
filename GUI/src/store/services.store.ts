@@ -104,8 +104,10 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       await axios.post(changeServiceStatus(), {
         id: selectedService.serviceId,
         state:
-          selectedService.state === ServiceState.Active
+          selectedService.state === ServiceState.Active && !draft
             ? ServiceState.Inactive
+            : selectedService.state === ServiceState.Active && draft
+            ? ServiceState.Draft
             : selectedService.state === ServiceState.Draft
             ? ServiceState.Ready
             : selectedService.state === ServiceState.Ready && activate
