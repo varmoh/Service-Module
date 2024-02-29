@@ -6,4 +6,4 @@ WHERE service = :serviceId
     FROM service_trigger
     WHERE service = :serviceId
   )
-  AND status != 'deleted';
+  AND status NOT IN ('deleted', 'declined');

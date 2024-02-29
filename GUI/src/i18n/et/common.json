@@ -58,7 +58,7 @@
     "newService": "Uus teenus",
     "close": "Sulge menüü",
     "intents": "Kavatsus",
-    "followupTraining": "Teemade järeltreenimine",
+    "auto-services": "Automatic Teenused",
     "entities": "Üksused",
     "settings": "Seaded",
     "faultyServices": "Probleemsed teenused"
@@ -141,8 +141,10 @@
         "updated": "Teenuse olek uuendatud",
         "failed": {
           "delete": "Teenuse kustutamine ebaõnnestus",
-          "state": "Teenuse oleku uuendamine ebaõnnestus"
-        }
+          "state": "Teenuse oleku uuendamine ebaõnnestus",
+          "requestConnection": "Ühenduse taotlus ebaõnnestus"
+        },
+        "requestedConnection": "Ühendust taotletakse"
       }
     },
     "popup": {
@@ -157,7 +159,18 @@
       "connectToIntent": "Ühendage kavatsusega",
       "intentNotConnected": "Teenus ei ole kavatsusega ühendatud, kas soovite selle ühendada?",
       "activateService": "Aktiveerige teenus",
-      "setToReady": "Seadke valmisolekusse"
+      "setToReady": "Seadke valmisolekusse",
+      "connect": "Ühendage",
+      "connectServiceToIntent": "Ühendage teenus kavatsusega",
+      "searchIntents": "Otsimise eesmärgid",
+      "intent": "Kavatsus"
+    }
+  },
+  "connectionRequests": {
+    "toast": {
+      "failed": {
+        "requests": "Ühendustaotluste toomine ebaõnnestus"
+      }
     }
   },
   "newService": {

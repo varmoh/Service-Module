@@ -1,0 +1,8 @@
+get_unconnected_intents:
+  call: http.post
+  args:
+    url: "[#SERVICE_TRAINING_RESQL]/get-unconnected-intents"
+  result: res
+
+return_result:
+  return: ${res.response.body}

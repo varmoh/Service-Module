@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MdDeleteOutline, MdOutlineDescription, MdOutlineEdit } from "react-icons/md";
 import { IoCopyOutline } from "react-icons/io5";
-import { Button, Card, Dialog, Icon, Label, Modal, Tooltip, Track } from "..";
+import { Button, Card, Icon, Label, Modal, Tooltip, Track } from "..";
 import { Service } from "../../types/service";
 import { ServiceState } from "../../types/service-state";
 import DataTable from "../DataTable";
@@ -15,6 +15,8 @@ import useServiceListStore from "store/services.store";
 import { ROUTES } from "resources/routes-constants";
 import useToastStore from "store/toasts.store";
 import "../../styles/main.scss";
+import ConnectServiceToIntentModel from "pages/Integration/ConnectServiceToIntentModel";
+import { Intent } from "types/Intent";
 
 type ServicesTableProps = {
   isCommon?: boolean;
@@ -115,14 +117,9 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
             onClick={() => {
               useServiceListStore.getState().setSelectedService(props.row.original);
               if (props.row.original.state === ServiceState.Ready) {
-                console.log("ready");
-                // setReadyPopupText(text);
                 checkIntentConnection();
                 setReadyStatusChecking(true);
                 setReadyPopupVisible(true);
-                // setTimeout(() => {
-                //   setReadyStatusChecking(false);
-                // }, 2000);
               } else {
                 showStatePopup(
                   t(
@@ -206,14 +203,15 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
     );
   };
 
-  const changeServiceState = () => {
+  const changeServiceState = (activate: boolean = false) => {
     useServiceListStore.getState().changeServiceState(
       () => {
         setReadyPopupVisible(false);
         setStatePopupVisible(false);
       },
       t("overview.service.toast.updated"),
-      t("overview.service.toast.failed.state")
+      t("overview.service.toast.failed.state"),
+      activate
     );
   };
 
@@ -224,6 +222,17 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         () => setDeletePopupVisible(false),
         t("overview.service.toast.deleted"),
         t("overview.service.toast.failed.delete")
+      );
+  };
+
+  const requestServiceIntentConnection = (intent: string) => {
+    useServiceListStore
+      .getState()
+      .requestServiceIntentConnection(
+        () => setIntentConnectionPopupVisible(false),
+        t("overview.service.toast.requestedConnection"),
+        t("overview.service.toast.failed.requestConnection"),
+        intent
       );
   };
 
@@ -247,7 +256,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
             <Button appearance="secondary" onClick={() => setStatePopupVisible(false)}>
               {t("overview.cancel")}
             </Button>
-            <Button onClick={changeServiceState}>{t("overview.popup.setToReady")}</Button>
+            <Button onClick={() => changeServiceState(false)}>{t("overview.popup.setState")}</Button>
           </Track>
         </Modal>
       )}
@@ -263,15 +272,28 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
               <Button appearance="secondary" onClick={() => setReadyPopupVisible(false)}>
                 {t("overview.cancel")}
               </Button>
-              <Button onClick={changeServiceState}>{t("overview.popup.setToDraft")}</Button>
+              <Button onClick={() => changeServiceState(false)}>{t("overview.popup.setToDraft")}</Button>
               {readyPopupText === t("overview.popup.setActive") ? (
-                <Button onClick={() => {}}>{t("overview.popup.activateService")}</Button>
+                <Button onClick={() => changeServiceState(true)}>{t("overview.popup.activateService")}</Button>
               ) : (
-                <Button onClick={() => {}}>{t("overview.popup.connectToIntent")}</Button>
+                <Button
+                  onClick={() => {
+                    setReadyPopupVisible(false);
+                    setIntentConnectionPopupVisible(true);
+                  }}
+                >
+                  {t("overview.popup.connectToIntent")}
+                </Button>
               )}
             </Track>
           )}
         </Modal>
+      )}
+      {isIntentConnectionPopupVisible && (
+        <ConnectServiceToIntentModel
+          onModalClose={() => setIntentConnectionPopupVisible(false)}
+          onConnect={(intent: Intent) => requestServiceIntentConnection(intent.intent)}
+        />
       )}
       <DataTable sortable data={services} columns={columns} />
     </Card>

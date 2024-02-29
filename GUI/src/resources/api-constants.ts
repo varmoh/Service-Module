@@ -15,11 +15,15 @@ export const getEndpointValidation = (): string => `${baseUrl}/services/endpoint
 export const deleteService = (): string => `${baseUrl}/services/delete`;
 export const changeServiceStatus = (): string => `${baseUrl}/services/status`;
 export const changeIntentConnection = (): string => `${baseUrl}/services/check-intent-connection`;
+export const requestServiceIntentConnection = (): string => `${baseUrl}/services/request-service-intent-connection`;
+export const respondToConnectionRequest = (): string => `${baseUrl}/services/respond-to-connection-request`;
 export const createNewService = (): string => `${baseUrl}/services/add`;
 export const testService = (state: ServiceState, serviceName: string): string =>
   `${baseUrl}/services/${state.toLowerCase()}/${serviceName}`;
 export const editService = (id: string): string => `${baseUrl}/services/edit?id=${id}`;
 export const getServicesList = (): string => `${baseUrl}/services`;
+export const getConnectionRequests = (): string => `${baseUrl}/services/connection-requests`;
+export const getAvailableIntents = (): string => `${baseUrl}/services/unconnected-intents`;
 export const jsonToYml = (): string => `${baseUrl}/saveJsonToYml`;
 export const getFaultyServices = (): string => `${baseUrl}/overview/services-detailed/nok`;
 export const trainingModuleTraining = (): string => `${trainingModuleBaseUrl}/treening/treeni-uus-mudel`;

@@ -4,10 +4,16 @@ import {
   changeIntentConnection,
   changeServiceStatus,
   deleteService as deleteServiceApi,
+  getAvailableIntents,
+  getConnectionRequests,
   getServicesList,
+  requestServiceIntentConnection,
+  respondToConnectionRequest,
 } from "resources/api-constants";
 import { Service, ServiceState } from "types";
 import useToastStore from "./toasts.store";
+import { Trigger } from "types/Trigger";
+import { Intent } from "types/Intent";
 
 interface ServiceStoreState {
   services: Service[];
@@ -17,9 +23,29 @@ interface ServiceStoreState {
   deleteService: (id: string) => Promise<void>;
   selectedService: Service | undefined;
   setSelectedService: (service: Service) => void;
-  changeServiceState: (onEnd: () => void, successMessage: string, errorMessage: string) => Promise<void>;
+  changeServiceState: (
+    onEnd: () => void,
+    successMessage: string,
+    errorMessage: string,
+    activate: boolean
+  ) => Promise<void>;
   checkServiceIntentConnection: (onConnected: () => void, onNotConnected: () => void) => Promise<void>;
   deleteSelectedService: (onEnd: () => void, successMessage: string, errorMessage: string) => Promise<void>;
+  requestServiceIntentConnection: (
+    onEnd: () => void,
+    successMessage: string,
+    errorMessage: string,
+    intent: string
+  ) => Promise<void>;
+  loadRequestsList: (onEnd: (requests: Trigger[]) => void, errorMessage: string) => Promise<void>;
+  loadAvailableIntentsList: (onEnd: (requests: Intent[]) => void, errorMessage: string) => Promise<void>;
+  respondToConnectionRequest: (
+    onEnd: () => void,
+    successMessage: string,
+    errorMessage: string,
+    status: boolean,
+    request: Trigger
+  ) => Promise<void>;
 }
 
 const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
@@ -62,7 +88,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       selectedService: service,
     });
   },
-  changeServiceState: async (onEnd, successMessage, errorMessage) => {
+  changeServiceState: async (onEnd, successMessage, errorMessage, activate) => {
     const selectedService = get().selectedService;
     console.log(selectedService);
     if (!selectedService) return;
@@ -75,9 +101,9 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
             ? ServiceState.Inactive
             : selectedService.state === ServiceState.Draft
             ? ServiceState.Ready
-            : selectedService.state === ServiceState.Ready
-            ? ServiceState.Draft
-            : ServiceState.Active,
+            : selectedService.state === ServiceState.Ready && activate
+            ? ServiceState.Active
+            : ServiceState.Draft,
         type: selectedService.type,
       });
       useToastStore.getState().success({ title: successMessage });
@@ -124,6 +150,55 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
     set({
       selectedService: undefined,
     });
+    onEnd();
+  },
+  requestServiceIntentConnection: async (onEnd, successMessage, errorMessage, intent) => {
+    const selectedService = get().selectedService;
+    if (!selectedService) return;
+
+    try {
+      await axios.post(requestServiceIntentConnection(), {
+        serviceId: selectedService.serviceId,
+        serviceName: selectedService.name,
+        intent: intent,
+      });
+      useToastStore.getState().success({ title: successMessage });
+    } catch (_) {
+      useToastStore.getState().error({ title: errorMessage });
+    }
+    onEnd();
+  },
+  loadRequestsList: async (onEnd, errorMessage) => {
+    try {
+      const requests = await axios.get(getConnectionRequests());
+      onEnd(requests.data.response);
+    } catch (_) {
+      onEnd([]);
+      useToastStore.getState().error({ title: errorMessage });
+    }
+  },
+  loadAvailableIntentsList: async (onEnd, errorMessage) => {
+    try {
+      const requests = await axios.get(getAvailableIntents());
+      onEnd(requests.data.response);
+    } catch (_) {
+      onEnd([]);
+      useToastStore.getState().error({ title: errorMessage });
+    }
+  },
+  respondToConnectionRequest: async (onEnd, successMessage, errorMessage, status, request) => {
+    try {
+      await axios.post(respondToConnectionRequest(), {
+        serviceId: request.service,
+        serviceName: request.serviceName,
+        intent: request.intent,
+        authorRole: request.authorRole,
+        status: status === true ? "approved" : "declined",
+      });
+      useToastStore.getState().success({ title: successMessage });
+    } catch (_) {
+      useToastStore.getState().error({ title: errorMessage });
+    }
     onEnd();
   },
 }));

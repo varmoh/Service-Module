@@ -58,7 +58,7 @@
     "newService": "New Service",
     "close": "Close menu",
     "intents": "Intents",
-    "followupTraining": "Followup Training",
+    "auto-services": "Automatic Services",
     "faultyServices": "Faulty Services",
     "entities": "Entities",
     "settings": "Settings"
@@ -141,8 +141,10 @@
         "updated": "Service state updated",
         "failed": {
           "delete": "Service deletion failed",
-          "state": "Service state update failed"
-        }
+          "state": "Service state update failed",
+          "requestConnection": "Connection Request failed"
+        },
+        "requestedConnection": "Connection Requested"
       }
     },
     "popup": {
@@ -157,7 +159,19 @@
       "connectToIntent": "Connect to intent",
       "intentNotConnected": "Service is not connected to an intent, do you want to connect it?",
       "activateService": "Activate service",
-      "setToReady": "Set to ready"
+      "setToReady": "Set to ready",
+      "connect": "Connect",
+      "connectServiceToIntent": "Connect service to intent",
+      "searchIntents": "Search intents",
+      "intent": "Intent"
+    }
+  },
+  "connectionRequests": {
+    "title": "Connection Requests",
+    "toast": {
+      "failed": {
+        "requests": "Failed to retreive connection requests"
+      }
     }
   },
   "newService": {
