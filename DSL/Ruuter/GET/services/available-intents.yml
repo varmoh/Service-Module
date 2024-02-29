@@ -1,7 +1,7 @@
-get_unconnected_intents:
+get_available_intents:
   call: http.post
   args:
-    url: "[#SERVICE_TRAINING_RESQL]/get-unconnected-intents"
+    url: "[#SERVICE_TRAINING_RESQL]/get-available-intents"
   result: res
 
 return_result:
