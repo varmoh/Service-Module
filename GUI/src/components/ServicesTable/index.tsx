@@ -283,6 +283,8 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
             <Button onClick={() => changeServiceState()}>
               {popupText === t("overview.popup.setInactive")
                 ? t("overview.popup.deactivate")
+                : popupText === t("overview.popup.setReady")
+                ? t("overview.popup.setState")
                 : t("overview.popup.activate")}
             </Button>
           </Track>
