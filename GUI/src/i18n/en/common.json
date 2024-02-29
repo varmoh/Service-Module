@@ -142,9 +142,13 @@
         "failed": {
           "delete": "Service deletion failed",
           "state": "Service state update failed",
-          "requestConnection": "Connection Request failed"
+          "requestConnection": "Connection Request failed",
+          "availableIntents": "Failed to retrieve available intents",
+          "cancelledConnection": "Connection Request Cancellation failed"
         },
-        "requestedConnection": "Connection Requested"
+        "requestedConnection": "Connection Requested",
+        "cancelledConnection": "Connection Request Cancelled"
+
       }
     },
     "popup": {
@@ -163,11 +167,19 @@
       "connect": "Connect",
       "connectServiceToIntent": "Connect service to intent",
       "searchIntents": "Search intents",
-      "intent": "Intent"
+      "intent": "Intent",
+      "connectionPending": "Connection to intent request is pending, would you like to cancel it?",
+      "cancelRequest": "Cancel request",
+      "noIntentsAvailable": "No intents available to be connected",
+      "connectionQuestion": "Are you sure you want to connect to this intent?",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
     }
   },
   "connectionRequests": {
     "title": "Connection Requests",
+    "approvedConnection": "Connection Approved",
+    "declinedConnection": "Connection Declined",
     "toast": {
       "failed": {
         "requests": "Failed to retreive connection requests"

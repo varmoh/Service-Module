@@ -1,4 +1,4 @@
-SELECT id, intent, service, status, author_role, created
+SELECT id, intent, service, service_name, status, author_role, created
 FROM service_trigger
 WHERE service = :serviceId
   AND id = (

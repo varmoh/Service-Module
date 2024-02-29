@@ -92,9 +92,8 @@ const DataTable: FC<DataTableProps> = ({
   const id = useId();
   const { t } = useTranslation();
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [steps, setSteps] = useState<number[]>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  let tablePagination = pagination ?? {
+  const tablePagination = pagination ?? {
     pageIndex: 0,
     pageSize: 10,
   };
@@ -217,13 +216,7 @@ const DataTable: FC<DataTableProps> = ({
                 table.setPageSize(Number(e.target.value));
               }}
             >
-              {[
-                table.getState().pagination.pageSize,
-                table.getState().pagination.pageSize + 10,
-                table.getState().pagination.pageSize + 20,
-                table.getState().pagination.pageSize + 30,
-                table.getState().pagination.pageSize + 40,
-              ].map((pageSize) => (
+              {[10, 20, 30, 40, 50].map((pageSize) => (
                 <option key={pageSize} value={pageSize}>
                   {pageSize}
                 </option>

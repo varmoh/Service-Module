@@ -27,9 +27,10 @@ interface ServiceStoreState {
     onEnd: () => void,
     successMessage: string,
     errorMessage: string,
-    activate: boolean
+    activate: boolean,
+    draft: boolean
   ) => Promise<void>;
-  checkServiceIntentConnection: (onConnected: () => void, onNotConnected: () => void) => Promise<void>;
+  checkServiceIntentConnection: (onConnected: (response: Trigger) => void, onNotConnected: () => void) => Promise<void>;
   deleteSelectedService: (onEnd: () => void, successMessage: string, errorMessage: string) => Promise<void>;
   requestServiceIntentConnection: (
     onEnd: () => void,
@@ -44,6 +45,12 @@ interface ServiceStoreState {
     successMessage: string,
     errorMessage: string,
     status: boolean,
+    request: Trigger
+  ) => Promise<void>;
+  cancelConnectionRequest: (
+    onEnd: () => void,
+    successMessage: string,
+    errorMessage: string,
     request: Trigger
   ) => Promise<void>;
 }
@@ -88,7 +95,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
       selectedService: service,
     });
   },
-  changeServiceState: async (onEnd, successMessage, errorMessage, activate) => {
+  changeServiceState: async (onEnd, successMessage, errorMessage, activate, draft) => {
     const selectedService = get().selectedService;
     console.log(selectedService);
     if (!selectedService) return;
@@ -102,6 +109,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
             : selectedService.state === ServiceState.Draft
             ? ServiceState.Ready
             : selectedService.state === ServiceState.Ready && activate
+            ? ServiceState.Active
+            : selectedService.state === ServiceState.Inactive && !draft
             ? ServiceState.Active
             : ServiceState.Draft,
         type: selectedService.type,
@@ -125,7 +134,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         serviceId: selectedService.serviceId,
       });
       if (res.data.response) {
-        onConnected();
+        onConnected(res.data.response);
       } else {
         onNotConnected();
       }
@@ -194,6 +203,21 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
         intent: request.intent,
         authorRole: request.authorRole,
         status: status === true ? "approved" : "declined",
+      });
+      useToastStore.getState().success({ title: successMessage });
+    } catch (_) {
+      useToastStore.getState().error({ title: errorMessage });
+    }
+    onEnd();
+  },
+  cancelConnectionRequest: async (onEnd, successMessage, errorMessage, request) => {
+    try {
+      await axios.post(respondToConnectionRequest(), {
+        serviceId: request.service,
+        serviceName: request.serviceName,
+        intent: request.intent,
+        authorRole: request.authorRole,
+        status: "deleted",
       });
       useToastStore.getState().success({ title: successMessage });
     } catch (_) {

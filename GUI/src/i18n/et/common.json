@@ -142,9 +142,12 @@
         "failed": {
           "delete": "Teenuse kustutamine ebaõnnestus",
           "state": "Teenuse oleku uuendamine ebaõnnestus",
-          "requestConnection": "Ühenduse taotlus ebaõnnestus"
+          "requestConnection": "Ühenduse taotlus ebaõnnestus",
+          "availableIntents": "Saadaolevate kavatsuste toomine ebaõnnestus",
+          "cancelledConnection": "Ühendustaotluse tühistamine ebaõnnestus"
         },
-        "requestedConnection": "Ühendust taotletakse"
+        "requestedConnection": "Ühendust taotletakse",
+        "cancelledConnection": "Ühenduse taotlus tühistati"
       }
     },
     "popup": {
@@ -163,10 +166,19 @@
       "connect": "Ühendage",
       "connectServiceToIntent": "Ühendage teenus kavatsusega",
       "searchIntents": "Otsimise eesmärgid",
-      "intent": "Kavatsus"
+      "intent": "Kavatsus",
+      "connectionPending": "Ühenduse loomine kavatsustaotlusega on ootel. Kas soovite selle tühistada?",
+      "cancelRequest": "Tühista soov",
+      "noIntentsAvailable": "Ühenduse loomiseks pole ühtegi kavatsust",
+      "connectionQuestion": "Kas olete kindel, et soovite selle kavatsusega ühenduse luua?",
+      "activate": "Aktiveerige",
+      "deactivate": "Deaktiveeri"
     }
   },
   "connectionRequests": {
+    "title": "Ühenduse taotlused",
+    "approvedConnection": "Ühendus kinnitatud",
+    "declinedConnection": "Ühendus tagasi lükatud",
     "toast": {
       "failed": {
         "requests": "Ühendustaotluste toomine ebaõnnestus"

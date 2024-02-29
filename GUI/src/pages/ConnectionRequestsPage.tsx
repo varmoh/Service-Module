@@ -26,8 +26,8 @@ const ConnectionRequestsPage: React.FC = () => {
       .getState()
       .respondToConnectionRequest(
         () => loadConnectionRequests(),
-        t("overview.service.toast.updated"),
-        t("overview.service.toast.failed.state"),
+        t("connectionRequests.approvedConnection"),
+        t("connectionRequests.declinedConnection"),
         status,
         request
       );

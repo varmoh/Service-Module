@@ -24,7 +24,7 @@ get_current_status:
 
 assign_old_status_and_path:
   assign:
-    old_file_status_path: ${status_res.response.body[0].currentState}
+    old_file_status_path: "${status_res.response.body[0].currentState === 'ready' ? 'draft' : status_res.response.body[0].currentState}"
     old_file_end: "${status_res.response.body[0].currentState !== 'active' ? '.tmp' : '.yml'}"
   next: check_status
 
@@ -88,6 +88,8 @@ check_for_status:
   switch:
     - condition: ${new_state === "active"}
       next: activate_service
+    - condition: ${new_state === "draft"}
+      next: draft_service  
   next: deactivate_service
 
 activate_service:
@@ -109,6 +111,16 @@ deactivate_service:
       new_path: "/Ruuter/${ruuter_type}/services/inactive/${name}.tmp"
   result: deactivate_service_result
   next: return_ok
+
+draft_service:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/move"
+    body:
+      current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
+      new_path: "/Ruuter/${ruuter_type}/services/draft/${name}.tmp"
+  result: draft_service_result
+  next: return_ok  
 
 return_ok:
   status: 200
