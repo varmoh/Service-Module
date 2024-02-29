@@ -5,11 +5,11 @@ import NotFoundPage from './pages/NotFoundPage'
 import OverviewPage from './pages/OverviewPage'
 import FaultyServicesPage from './pages/FaultyServicesPage'
 import { ROUTES } from './resources/routes-constants'
-import IntentsFollowupTraining from './pages/Training/IntentsFollowupTraining'
 import NewServicePage from './pages/NewServicePage'
 import ServiceFlowPage from './pages/ServiceFlowPage'
 import ServiceSettingPage from './pages/ServiceSettingPage'
 import './styles/main.scss'
+import ConnectionRequestsPage from 'pages/ConnectionRequestsPage'
 
 const RootComponent: React.FC = () => {
   return (
@@ -22,7 +22,7 @@ const RootComponent: React.FC = () => {
       <Route element={<Layout />}>
         <Route path={"/service"} element={<Navigate to="/services/overview" />} />
         <Route path={ROUTES.OVERVIEW_ROUTE} element={<OverviewPage />} />
-        <Route path={ROUTES.FOLLOWUPTRAINING_ROUTE} element={<IntentsFollowupTraining />} />
+        <Route path={ROUTES.AUTOSERVICES_ROUTE} element={<ConnectionRequestsPage />} />
         <Route path={ROUTES.FAULTY_SERVICES_ROUTE} element={<FaultyServicesPage />} />
         <Route path={ROUTES.SERVICE_SETTINGS} element={<ServiceSettingPage />} />
         <Route path={ROUTES.FAULTY_SERVICES_ROUTE} element={<FaultyServicesPage />} />

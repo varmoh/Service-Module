@@ -9,8 +9,8 @@ check_for_required_parameters:
   switch:
     - condition: ${id === null || new_state === null || ruuter_type === null}
       next: return_incorrect_request
-    - condition: ${new_state === "draft"}
-      next: return_cant_set_to_draft
+    - condition: ${new_state === "ready"}
+      next: set_plain_status
   next: get_current_status
 
 get_current_status:
@@ -24,7 +24,7 @@ get_current_status:
 
 assign_old_status_and_path:
   assign:
-    old_file_status_path: ${status_res.response.body[0].currentState}
+    old_file_status_path: "${status_res.response.body[0].currentState === 'ready' ? 'draft' : status_res.response.body[0].currentState}"
     old_file_end: "${status_res.response.body[0].currentState !== 'active' ? '.tmp' : '.yml'}"
   next: check_status
 
@@ -43,6 +43,16 @@ set_status:
       new_state: ${new_state}
   result: res
   next: get_status_name
+
+set_plain_status:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/set-status"
+    body:
+      id: ${id}
+      new_state: ${new_state}
+  result: draft_res
+  next: return_ok
 
 get_status_name:
   call: http.post
@@ -78,6 +88,8 @@ check_for_status:
   switch:
     - condition: ${new_state === "active"}
       next: activate_service
+    - condition: ${new_state === "draft"}
+      next: draft_service  
   next: deactivate_service
 
 activate_service:
@@ -100,6 +112,43 @@ deactivate_service:
   result: deactivate_service_result
   next: return_ok
 
+draft_service:
+  call: http.post
+  args:
+    url: "[#SERVICE_NODE]/file/move"
+    body:
+      current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
+      new_path: "/Ruuter/${ruuter_type}/services/draft/${name}.tmp"
+  result: draft_service_result
+  next: check_for_intent_connection
+
+check_for_intent_connection:
+  call: http.post
+  args:
+    url: "[#SERVICE_TRAINING_RESQL]/get-service-trigger"
+    body:
+      serviceId: ${id}
+  result: connection_res
+  next: check_is_connected_to_intents_or_has_requests
+
+check_is_connected_to_intents_or_has_requests:
+  switch:
+    - condition: ${connection_res.response.body.length > 0}
+      next: delete_intent_connection
+  next: return_ok
+
+delete_intent_connection:
+  call: http.post
+  args:
+    url: "[#SERVICE_TRAINING_RESQL]/add-service-trigger"
+    body:
+      serviceId: ${id}
+      intent: ${connection_res.response.body[0].intent}
+      status: "deleted"
+      authorRole: ${connection_res.response.body[0].authorRole}
+      serviceName: ${connection_res.response.body[0].serviceName}
+  result: return_ok
+
 return_ok:
   status: 200
   return: "Status Changed Successfully"
@@ -113,11 +162,6 @@ return_bad_request:
 return_incorrect_request:
   status: 400
   return: "Required parameter(s) missing"
-  next: end
-
-return_cant_set_to_draft:
-  status: 400
-  return: "Changing state to draft is not allowed"
   next: end
 
 return_same_state_update:

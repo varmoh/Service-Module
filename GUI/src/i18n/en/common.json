@@ -58,7 +58,7 @@
     "newService": "New Service",
     "close": "Close menu",
     "intents": "Intents",
-    "followupTraining": "Followup Training",
+    "auto-services": "Automatic Services",
     "faultyServices": "Faulty Services",
     "entities": "Entities",
     "settings": "Settings"
@@ -133,22 +133,57 @@
       "states": {
         "active": "Active",
         "inactive": "Inactive",
-        "draft": "Draft"
+        "draft": "Draft",
+        "ready": "Ready"
       },
       "toast": {
         "deleted": "Service has been successfully deleted",
         "updated": "Service state updated",
         "failed": {
           "delete": "Service deletion failed",
-          "state": "Service state update failed"
-        }
+          "state": "Service state update failed",
+          "requestConnection": "Connection Request failed",
+          "availableIntents": "Failed to retrieve available intents",
+          "cancelledConnection": "Connection Request Cancellation failed"
+        },
+        "requestedConnection": "Connection Requested",
+        "cancelledConnection": "Connection Request Cancelled"
+
       }
     },
     "popup": {
       "delete": "Are you sure that you want to delete the service?",
       "setActive": "Are you sure you want to activate this service?",
+      "setReady": "Are you sure you want to mark this service as ready?",
+      "setDraft": "Are you sure you want to mark this service as draft?",
       "setInactive": "Are you sure you want to deactivate this service?",
-      "setState": "Update state"
+      "setState": "Update state",
+      "checking": "Checking if service is connected to an intent",
+      "setToDraft": "Set to draft",
+      "connectToIntent": "Connect to intent",
+      "intentNotConnected": "Service is not connected to an intent, do you want to connect it?",
+      "activateService": "Activate service",
+      "setToReady": "Set to ready",
+      "connect": "Connect",
+      "connectServiceToIntent": "Connect service to intent",
+      "searchIntents": "Search intents",
+      "intent": "Intent",
+      "connectionPending": "Connection to intent request is pending, would you like to cancel it?",
+      "cancelRequest": "Cancel request",
+      "noIntentsAvailable": "No intents available to be connected",
+      "connectionQuestion": "Are you sure you want to connect to this intent?",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    }
+  },
+  "connectionRequests": {
+    "title": "Connection Requests",
+    "approvedConnection": "Connection Approved",
+    "declinedConnection": "Connection Declined",
+    "toast": {
+      "failed": {
+        "requests": "Failed to retreive connection requests"
+      }
     }
   },
   "newService": {

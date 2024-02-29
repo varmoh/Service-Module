@@ -58,7 +58,7 @@
     "newService": "Uus teenus",
     "close": "Sulge menüü",
     "intents": "Kavatsus",
-    "followupTraining": "Teemade järeltreenimine",
+    "auto-services": "Automatic Teenused",
     "entities": "Üksused",
     "settings": "Seaded",
     "faultyServices": "Probleemsed teenused"
@@ -133,22 +133,56 @@
       "states": {
         "active": "Aktiivne",
         "inactive": "Mitteaktiivne",
-        "draft": "Mustand"
+        "draft": "Mustand",
+        "ready": "Valmis"
       },
       "toast": {
         "deleted": "Teenus kustutatud",
         "updated": "Teenuse olek uuendatud",
         "failed": {
           "delete": "Teenuse kustutamine ebaõnnestus",
-          "state": "Teenuse oleku uuendamine ebaõnnestus"
-        }
+          "state": "Teenuse oleku uuendamine ebaõnnestus",
+          "requestConnection": "Ühenduse taotlus ebaõnnestus",
+          "availableIntents": "Saadaolevate kavatsuste toomine ebaõnnestus",
+          "cancelledConnection": "Ühendustaotluse tühistamine ebaõnnestus"
+        },
+        "requestedConnection": "Ühendust taotletakse",
+        "cancelledConnection": "Ühenduse taotlus tühistati"
       }
     },
     "popup": {
       "delete": "Kas oled kindel, et soovid teenuse kustutada?",
       "setActive": "Kas oled kindel, et tahad teenuse aktiveerida?",
+      "setReady": "Kas olete kindel, et soovite selle teenuse valmisolekuks märkida?",
+      "setDraft": "Kas olete kindel, et soovite selle teenuse mustandiks märkida?",
       "setInactive": "Kas oled kindel, et tahad teenuse deaktiveerida?",
-      "setState": "Uuenda olek"
+      "setState": "Uuenda olek",
+      "checking": "Kontrollitakse, kas teenus on kavatsusega ühendatud",
+      "setToDraft": "Määra mustandiks",
+      "connectToIntent": "Ühendage kavatsusega",
+      "intentNotConnected": "Teenus ei ole kavatsusega ühendatud, kas soovite selle ühendada?",
+      "activateService": "Aktiveerige teenus",
+      "setToReady": "Seadke valmisolekusse",
+      "connect": "Ühendage",
+      "connectServiceToIntent": "Ühendage teenus kavatsusega",
+      "searchIntents": "Otsimise eesmärgid",
+      "intent": "Kavatsus",
+      "connectionPending": "Ühenduse loomine kavatsustaotlusega on ootel. Kas soovite selle tühistada?",
+      "cancelRequest": "Tühista soov",
+      "noIntentsAvailable": "Ühenduse loomiseks pole ühtegi kavatsust",
+      "connectionQuestion": "Kas olete kindel, et soovite selle kavatsusega ühenduse luua?",
+      "activate": "Aktiveerige",
+      "deactivate": "Deaktiveeri"
+    }
+  },
+  "connectionRequests": {
+    "title": "Ühenduse taotlused",
+    "approvedConnection": "Ühendus kinnitatud",
+    "declinedConnection": "Ühendus tagasi lükatud",
+    "toast": {
+      "failed": {
+        "requests": "Ühendustaotluste toomine ebaõnnestus"
+      }
     }
   },
   "newService": {
