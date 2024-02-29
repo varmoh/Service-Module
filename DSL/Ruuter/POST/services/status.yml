@@ -9,7 +9,7 @@ check_for_required_parameters:
   switch:
     - condition: ${id === null || new_state === null || ruuter_type === null}
       next: return_incorrect_request
-    - condition: ${new_state === "draft" || new_state === "ready"}
+    - condition: ${new_state === "ready"}
       next: set_plain_status
   next: get_current_status
 
@@ -120,7 +120,34 @@ draft_service:
       current_path: "/Ruuter/${ruuter_type}/services/${old_file_status_path}/${name + old_file_end}"
       new_path: "/Ruuter/${ruuter_type}/services/draft/${name}.tmp"
   result: draft_service_result
-  next: return_ok  
+  next: check_for_intent_connection
+
+check_for_intent_connection:
+  call: http.post
+  args:
+    url: "[#SERVICE_TRAINING_RESQL]/get-service-trigger"
+    body:
+      serviceId: ${id}
+  result: connection_res
+  next: check_is_connected_to_intents_or_has_requests
+
+check_is_connected_to_intents_or_has_requests:
+  switch:
+    - condition: ${connection_res.response.body.length > 0}
+      next: delete_intent_connection
+  next: return_ok
+
+delete_intent_connection:
+  call: http.post
+  args:
+    url: "[#SERVICE_TRAINING_RESQL]/add-service-trigger"
+    body:
+      serviceId: ${id}
+      intent: ${connection_res.response.body[0].intent}
+      status: "deleted"
+      authorRole: ${connection_res.response.body[0].authorRole}
+      serviceName: ${connection_res.response.body[0].serviceName}
+  result: return_ok
 
 return_ok:
   status: 200
