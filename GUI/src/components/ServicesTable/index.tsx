@@ -148,7 +148,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
         },
         cell: (props) => (
           <Track justify="center">
-            <label style={{ paddingRight: 35 }}>{props.cell.getValue()}</label>
+            <label style={{ paddingRight: 40 }}>{props.cell.getValue()}</label>
           </Track>
         ),
       }),
