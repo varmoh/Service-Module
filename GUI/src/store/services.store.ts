@@ -61,7 +61,8 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
   notCommonServices: [],
   loadServicesList: async () => {
     const result = await axios.get(getServicesList());
-    const services = result.data.response.map(
+    const triggers = result.data.response[1];
+    const services = result.data.response[0].map(
       (item: any) =>
         ({
           id: item.id,
@@ -72,6 +73,7 @@ const useServiceListStore = create<ServiceStoreState>((set, get, store) => ({
           isCommon: item.iscommon,
           serviceId: item.serviceId,
           usedCount: 0,
+          linkedIntent: triggers.find((e: Trigger) => e.service === item.serviceId)?.intent || "",
         } as Service)
     );
 
