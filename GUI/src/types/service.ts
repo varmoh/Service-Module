@@ -11,4 +11,5 @@ export interface Service {
   readonly structure: any;
   readonly endpoints: any;
   readonly serviceId: string;
+  readonly linkedIntent: string;
 }

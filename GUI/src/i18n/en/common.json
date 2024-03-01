@@ -130,6 +130,7 @@
       "name": "Name",
       "usedCount": "Times service has been triggered",
       "state": "State",
+      "linkedIntent": "Linked Intent",
       "states": {
         "active": "Active",
         "inactive": "Inactive",

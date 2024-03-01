@@ -141,6 +141,17 @@ const ServicesTable: FC<ServicesTableProps> = ({ isCommon = false }) => {
           </Track>
         ),
       }),
+      columnHelper.accessor("linkedIntent", {
+        header: t("overview.service.linkedIntent") ?? "",
+        meta: {
+          size: 200,
+        },
+        cell: (props) => (
+          <Track justify="center">
+            <label style={{ paddingRight: 40 }}>{props.cell.getValue()}</label>
+          </Track>
+        ),
+      }),
       columnHelper.display({
         id: "edit",
         meta: {

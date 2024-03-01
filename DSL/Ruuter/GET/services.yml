@@ -2,9 +2,20 @@ get_services_list:
   call: http.post
   args:
     url: "[#SERVICE_RESQL]/get-services-list"
-  result: results
+  result: services_res
+
+get_approved_triggers:
+  call: http.post
+  args:
+    url: "[#SERVICE_TRAINING_RESQL]/get-approved-tiggers"
+  result: triggers_res
+
+assign_results:
+  assign: 
+    services: ${services_res.response.body}
+    triggers: ${triggers_res.response.body}
 
 return_ok:
   status: 200
-  return: ${results.response.body}
+  return: ${[services, triggers]}
   next: end
